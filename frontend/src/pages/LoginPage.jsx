@@ -1,15 +1,45 @@
 import React, { useState } from 'react';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios'; // pour la connexion à l'API
 
+//Page de connexion
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate(); // pour rediriger après la connexion réussie
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Appel API d'authentif ici plus tard
+    setIsLoading(true);
+
+    if (!email || !password) {
+      alert("Tous les champs doivent être remplis");
+      return;
+    }
+    try {
+      //pour envoyer les données email et password à l’API
+      const response = await axios.post('http://localhost:5000/api/login', {
+        email,
+        password,
+      });
+  
+      if (response.status === 200) {
+        alert("Connexion réussie !");
+        // Stocker le token si nécessaire (exemple : localStorage)
+        localStorage.setItem('token', response.data.token);
+        navigate('/dashboard'); // Redirection après connexion
+      }
+
+    }
+     catch (error) {
+      alert("Erreur lors de la connexion. Veuillez réessayer, avec des identifiants valides.");
+    }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   return (
