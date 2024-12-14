@@ -6,7 +6,11 @@ const Button = ({ text, onClick, type = "button", disabled, className = "" }) =>
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-300 w-full ${className}`}
+      className={`p-3 rounded transition duration-300 ${
+        disabled
+          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+          : "bg-blue-500 text-white hover:bg-blue-600"
+      } ${className}`}
     >
       {text}
     </button>
