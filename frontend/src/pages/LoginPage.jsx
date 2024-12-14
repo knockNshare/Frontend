@@ -43,33 +43,32 @@ const LoginPage = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
-      <h2>Connexion</h2>
-      <form onSubmit={handleSubmit}>
-        <InputField
-          id="login-email"          
-          name="email"              
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-        />
-        <InputField
-          id="login-password"       
-          name="password"           
-          type="password"
-          placeholder="Mot de passe"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-        />
-
-        <Button text="Se connecter" />
-      </form>
-      <p>
-        Pas encore inscrit ? <Link to="/signup">Créer un compte</Link>
-      </p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center mb-6 text-gray-700">Connexion</h2>
+        <form>
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full p-3 mb-4 border rounded focus:ring-2 focus:ring-blue-400"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Mot de passe"
+            className="w-full p-3 mb-6 border rounded focus:ring-2 focus:ring-blue-400"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-300"
+          >
+            Se connecter
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
