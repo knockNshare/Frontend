@@ -17,6 +17,7 @@ const LoginPage = () => {
 
     if (!email || !password) {
       alert("Tous les champs doivent être remplis");
+      setIsLoading(false);
       return;
     }
     try {
@@ -45,29 +46,37 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-700">Connexion</h2>
-        <form>
-          <input
+        <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Connexion</h2>
+        <form onSubmit={handleSubmit}>
+          <InputField
+            id="email"
             type="email"
             placeholder="Email"
-            className="w-full p-3 mb-4 border rounded focus:ring-2 focus:ring-blue-400"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            autoComplete="email"
           />
-          <input
+          <InputField
+            id="password"
             type="password"
             placeholder="Mot de passe"
-            className="w-full p-3 mb-6 border rounded focus:ring-2 focus:ring-blue-400"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
           />
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600 transition duration-300"
-          >
-            Se connecter
-          </button>
+          <Button 
+            type="submit" 
+            text={isLoading ? "Connexion..." : "Se connecter"} 
+            disabled={isLoading} 
+          />
         </form>
+        {/* lien vers signup */}
+        <p className="text-center mt-4 text-sm">
+          Pas encore inscrit ?{' '}
+          <Link to="/signup" className="text-blue-500 hover:underline">
+            Créer un compte
+          </Link>
+        </p>
       </div>
     </div>
   );
