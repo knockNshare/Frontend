@@ -25,7 +25,7 @@ const LoginPage = () => {
         email,
         password,
       });
-  
+
       if (response.status === 200) {
         alert("Connexion réussie !");
         // Stocker le token si nécessaire (exemple : localStorage)
@@ -34,7 +34,7 @@ const LoginPage = () => {
       }
 
     }
-     catch (error) {
+    catch (error) {
       alert("Erreur lors de la connexion. Veuillez réessayer, avec des identifiants valides.");
     }
     finally {
@@ -47,17 +47,24 @@ const LoginPage = () => {
       <h2>Connexion</h2>
       <form onSubmit={handleSubmit}>
         <InputField
+          id="login-email"          
+          name="email"              
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
         />
         <InputField
+          id="login-password"       
+          name="password"           
           type="password"
           placeholder="Mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="current-password"
         />
+
         <Button text="Se connecter" />
       </form>
       <p>

@@ -30,11 +30,11 @@ const SignupPage = () => {
         email,
         password,
       });
-  
+
       if (response.status === 201) {
         alert("Inscription réussie !");
         navigate('/login'); // Redirige vers la page de connexion
-        
+
       }
     } catch (error) {
       console.error('Erreur lors de l\'inscription :', error.response || error.message);
@@ -47,30 +47,43 @@ const SignupPage = () => {
     <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px' }}>
       <h2>Inscription</h2>
       <form onSubmit={handleSubmit}>
-      <InputField
+        <InputField
+          id="signup-name"              
+          name="name"                   
           type="text"
           placeholder="Nom"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
         />
         <InputField
+          id="signup-email"
+          name="email"
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
         />
         <InputField
+          id="signup-password"
+          name="password"
           type="password"
           placeholder="Mot de passe"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
         />
         <InputField
+          id="signup-confirm-password"
+          name="confirm-password"
           type="password"
           placeholder="Confirmer le mot de passe"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          autoComplete="new-password"
         />
+
         <Button text="S'inscrire" />
       </form>
       <p>
