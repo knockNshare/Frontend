@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // pour la connexion à l'API
+import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 
-//Page de connexion
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate(); // pour rediriger après la connexion réussie
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated, login } = useAuth();
+
+  // On redirige si le membre est déjà authentifié
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,8 +26,9 @@ const LoginPage = () => {
       setIsLoading(false);
       return;
     }
+
     try {
-      //pour envoyer les données email et password à l’API
+      // pour envoyer les données email et password à l’API
       const response = await axios.post('http://localhost:5001/api/login', {
         email,
         password,
@@ -29,16 +36,13 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         alert("Connexion réussie !");
-        // Stocker le token si nécessaire (exemple : localStorage)
         localStorage.setItem('token', response.data.token);
-        navigate('/dashboard'); // Redirection après connexion
+        login(); // pour l'état global
+        navigate('/dashboard'); // ça redirige vers le dashboard après la connexion
       }
-
-    }
-    catch (error) {
+    } catch (error) {
       alert("Erreur lors de la connexion. Veuillez réessayer, avec des identifiants valides.");
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -64,13 +68,13 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
           />
-          <Button 
-            type="submit" 
-            text={isLoading ? "Connexion..." : "Se connecter"} 
-            disabled={isLoading} 
+          <Button
+            type="submit"
+            text={isLoading ? "Connexion..." : "Se connecter"}
+            disabled={isLoading}
+            className="w-full"
           />
         </form>
-        {/* lien vers signup */}
         <p className="text-center mt-4 text-sm">
           Pas encore inscrit ?{' '}
           <Link to="/signup" className="text-blue-500 hover:underline">

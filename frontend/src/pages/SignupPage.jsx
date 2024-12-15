@@ -12,7 +12,7 @@ const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Définition des règles de validation du mot de passe
+  // regex pour la force du mot de passe
   const passwordConditions = [
     { regex: /.{8,}/, message: "Au moins 8 caractères" },
     { regex: /[a-z]/, message: "Une lettre minuscule" },
@@ -52,7 +52,7 @@ const SignupPage = () => {
 
       if (response.status === 201) {
         alert("Inscription réussie !");
-        navigate('/login');
+        navigate('/dashboard');
       }
     } catch (error) {
       alert("Erreur lors de l'inscription. Veuillez réessayer.");
