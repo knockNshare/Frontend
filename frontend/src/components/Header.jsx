@@ -6,7 +6,7 @@ const Header = () => {
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
 
-  // Empêcher le Header d'apparaître sur /login et /signup
+  // pour empêcher le Header d'apparaître sur /login et /signup
   if (location.pathname === '/login' || location.pathname === '/signup') {
     return null;
   }
