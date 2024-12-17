@@ -6,6 +6,8 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import Dashboard from './pages/Dashboard';
+import UserManagementPage from './pages/UserManagementPage';
+
 
 const App = () => {
   const { isAuthenticated } = useAuth();
@@ -13,13 +15,11 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* pour les visiteurs */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />} />
         <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <SignupPage />} />
-        {/* pour les membres authentifiés */}
         <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} />
-
+         <Route path="/users" element={<UserManagementPage />} />
         {/* Page 404 */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
