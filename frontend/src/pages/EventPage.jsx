@@ -10,37 +10,28 @@ const EventPage = () => {
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
+    // Fonction pour formater la date en DD/MM/YYYY
+    const formatDate = (dateString) => {
+        if (!dateString) return null;
+        const [year, month, day] = dateString.split('-');
+        return `${day}/${month}/${year}`;
+    };
+
     const addEvent = (newEvent) => {
         const eventWithImage = {
             ...newEvent,
             image: newEvent.image ? URL.createObjectURL(newEvent.image) : DefaultImage,
         };
 
-        const formattedStartDate = new Date(newEvent.startDate).toLocaleString('fr-FR', {
-            day: 'numeric',
-            month: 'numeric',
-            year: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-        });
-
-        const formattedEndDate = newEvent.endDate
-            ? new Date(newEvent.endDate).toLocaleString('fr-FR', {
-                day: 'numeric',
-                month: 'numeric',
-                year: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-            })
-            : null;
-
         setEvents([
             ...events,
             {
                 ...eventWithImage,
-                startDate: formattedStartDate,
-                endDate: formattedEndDate,
-                id: Date.now(), 
+                id: Date.now(),
+                startDate: formatDate(newEvent.startDate), 
+                startTime: newEvent.startTime || null, 
+                endDate: formatDate(newEvent.endDate) || null, 
+                endTime: newEvent.endTime || null, 
             },
         ]);
         setShowForm(false);
@@ -111,7 +102,9 @@ const EventPage = () => {
                                 : event.description}
                         </p>
                         <p className="text-sm text-gray-500 mb-2">
-                            {event.endDate ? `Du ${event.startDate} au ${event.endDate}` : event.startDate}
+                            {event.endDate
+                                ? `Du ${event.startDate}${event.startTime ? ` à ${event.startTime}` : ''} au ${event.endDate}${event.endTime ? ` à ${event.endTime}` : ''}`
+                                : `${event.startDate}${event.startTime ? ` à ${event.startTime}` : ''}`}
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {event.categories.map((category) => (
