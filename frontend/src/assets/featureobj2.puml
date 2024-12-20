@@ -1,0 +1,29 @@
+@startuml
+actor User as Claire
+participant "Frontend" as FE
+participant "Backend" as BE
+participant "Database" as DB
+
+Claire -> FE: Accède au tableau de bord
+FE -> BE: GET /dashboard
+BE -> DB: Récupère les catégories et données utilisateur
+DB --> BE: Renvoie les données (catégories, historique)
+BE --> FE: Renvoie les données affichables
+FE --> Claire: Affiche le tableau de bord
+
+Claire -> FE: Recherche dans la catégorie "Mode"
+FE -> BE: GET /propositions/search?category=Mode
+BE -> DB: Effectue une requête sur les propositions
+DB --> BE: Renvoie les propositions correspondant à la catégorie
+BE --> FE: Renvoie les résultats de recherche
+FE --> Claire: Affiche les résultats
+
+Claire -> FE: Clique sur "Demander" pour un objet
+FE -> BE: POST /interests {user_id, proposition_id}
+BE -> DB: Crée une nouvelle demande avec statut "pending"
+DB --> BE: Confirmation de la création
+BE --> FE: Succès de la demande
+FE --> Claire: Message de confirmation
+
+BE -> DB: Notifie le proposeur de la demande (optionnel)
+@enduml

@@ -1,0 +1,18 @@
+@startuml
+actor Utilisateur as U
+actor Backend as B
+actor Proposeur as P
+
+U -> B : Recherche un objet/service (via catégorie)
+B -> B : Vérifie si des propositions existent
+alt Propositions trouvées
+    B --> U : Liste des propositions
+    U -> P : Demande d'intérêt pour une proposition
+    P -> B : Accepte ou refuse la demande
+    alt Demande acceptée
+        B -> U : Communique les coordonnées (email, téléphone)
+    
+    end
+
+end
+@enduml

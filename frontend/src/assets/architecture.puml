@@ -1,0 +1,87 @@
+@startuml
+package "Pages" {
+  component "App" {
+  }
+  note right of App
+    - Définit les routes principales.
+    - Inclut Dashboard, UserProfile, EventPage.
+  end note
+
+  component "Dashboard" {
+  }
+  note right of Dashboard
+    - Page principale pour l'utilisateur connecté.
+    - Rend SearchFeature, Notifications, SolidarityEvents.
+  end note
+
+  component "UserProfile" {
+  }
+  note right of UserProfile
+    - Gère les propositions et les intérêts.
+  end note
+
+  component "EventPage" {
+  }
+  note right of EventPage
+    - Gère la création et la gestion des événements.
+    - Contient EventForm et une liste filtrée des événements.
+  end note
+}
+
+package "Event Components" {
+  component "EventForm" {
+  }
+  note right of EventForm
+    - Formulaire pour créer un événement.
+    - Utilise une API pour valider l'adresse et envoyer les données.
+  end note
+}
+
+package "Dashboard Components" {
+  component "Notifications" {
+  }
+  note right of Notifications
+    - Affiche les notifications utilisateur (vide actuellement).
+  end note
+
+  component "SearchFeature" {
+  }
+  note right of SearchFeature
+    - Barre de recherche et résultats des objets/services.
+    - Contient SearchBar et ResultsList.
+  end note
+
+  component "SolidarityEvents" {
+  }
+  note right of SolidarityEvents
+    - Affiche les événements solidaires (vide actuellement).
+  end note
+}
+
+package "SearchFeature Subcomponents" {
+  component "SearchBar" {
+  }
+  note right of SearchBar
+    - Champ de recherche pour l'utilisateur.
+  end note
+
+  component "ResultsList" {
+  }
+  note right of ResultsList
+    - Affiche les résultats de recherche (objets/services).
+  end note
+}
+
+App --> Dashboard
+App --> UserProfile
+App --> EventPage
+
+EventPage --> EventForm
+
+Dashboard --> Notifications
+Dashboard --> SearchFeature
+Dashboard --> SolidarityEvents
+
+SearchFeature --> SearchBar
+SearchFeature --> ResultsList
+@enduml
