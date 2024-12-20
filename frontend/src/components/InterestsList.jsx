@@ -39,7 +39,7 @@ function InterestsList() {
         )
       );
 
-      alert(response.data.message);
+     // alert(response.data.message);
     } catch (error) {
       console.error("Erreur lors de la mise à jour de l'intérêt :", error);
       alert("Une erreur est survenue lors de la mise à jour de l'intérêt.");
