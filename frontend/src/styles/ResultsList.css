@@ -34,3 +34,18 @@
     color: #666;
     font-size: 14px;
   }
+
+  .results-list-button {
+    padding: 8px 12px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .results-list-button:hover {
+    background-color: #0056b3;
+  }

@@ -1,7 +1,34 @@
+import React from "react";
+import axios from "axios";
 import "../styles/ResultsList.css";
-import React from 'react';
 
 const ResultsList = ({ results }) => {
+    const handleRequestInterest = async (propositionId) => {
+        const userId = localStorage.getItem("userId");
+      
+        if (!userId) {
+          alert("Vous devez être connecté pour effectuer cette action.");
+          return;
+        }
+      
+        // Obtenir la date actuelle en UTC et la convertir au format MySQL
+        const currentDate = new Date();
+        const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ");
+      
+        try {
+          const response = await axios.post("http://localhost:3000/interests", {
+            proposition_id: propositionId,
+            interested_user_id: userId,
+            start_date: formattedDate,
+            end_date: null, // Si end_date n'est pas nécessaire, on peut laisser null
+          });
+          alert("Demande d'intérêt envoyée avec succès !");
+        } catch (error) {
+          console.error("Erreur lors de l'envoi de la demande d'intérêt :", error);
+          alert(error.response?.data?.error || "Une erreur est survenue.");
+        }
+      };
+
   if (results.length === 0) {
     return <p className="results-list-empty">Aucun résultat trouvé.</p>;
   }
@@ -13,6 +40,12 @@ const ResultsList = ({ results }) => {
           <h3 className="results-list-title">{result.title}</h3>
           <p className="results-list-description">{result.description}</p>
           <p className="results-list-distance">Distance : {result.distance} km</p>
+          <button
+            className="results-list-button"
+            onClick={() => handleRequestInterest(result.id)}
+          >
+            Demander
+          </button>
         </li>
       ))}
     </ul>
