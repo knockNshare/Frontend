@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../styles/Dashboard.css"; // Importation du CSS
 import SearchFeature from "../components/SearchFeature";
 import Notifications from "../components/Notifications";
@@ -10,7 +11,9 @@ function Dashboard() {
     <div className="dashboard">
       {/* Header : Profil utilisateur et notifications */}
       <header className="dashboard-header">
-        <UserProfile />
+        <Link to="/profile" className="dashboard-profile-link"> {/* Ajoute un lien */}
+          <button className="profile-button">Mon Profil</button>
+        </Link>
         <Notifications />
       </header>
 
