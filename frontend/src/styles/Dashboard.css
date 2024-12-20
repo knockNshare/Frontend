@@ -1,0 +1,36 @@
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f0f2f5; 
+    font-family: 'Arial', sans-serif; /* Ajout pour uniformiser la typographie */
+    color: #333; /* Défaut pour le texte global */
+  }
+  
+  .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #007bff;
+    color: #fff;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dashboard-main {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #fff; /* Couleur blanche pour contraster les sections */
+    border-radius: 8px; /* Ajout d'arrondis pour un design moderne */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ombre douce */
+  }
+  
+  .dashboard-footer {
+    padding: 15px 20px;
+    background-color: #f1f1f1;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    border-top: 1px solid #ddd; /* Séparation subtile avec la section principale */
+  }

@@ -9,6 +9,8 @@ const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [cityId, setCityId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -30,26 +32,28 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
-    if (!name || !email || !password || !confirmPassword) {
+  
+    if (!name || !email || !phoneNumber || !password || !confirmPassword || !cityId) {
       alert("Tous les champs doivent être remplis");
       setIsLoading(false);
       return;
     }
-
+  
     if (password !== confirmPassword) {
       alert("Les mots de passe ne correspondent pas");
       setIsLoading(false);
       return;
     }
-
+  
     try {
       const response = await axios.post('http://localhost:3000/api/signup', {
         name,
         email,
+        phone_number: phoneNumber, // Inclure le numéro de téléphone
         password,
+        city_id: cityId,
       });
-
+  
       if (response.status === 201) {
         alert("Inscription réussie !");
         navigate('/dashboard');
@@ -74,6 +78,7 @@ const SignupPage = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
+          
           <InputField
             id="signup-email"
             name="email"
@@ -83,6 +88,22 @@ const SignupPage = () => {
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
           />
+          <InputField
+              id="signup-city-id"
+              name="city-id"
+              type="text"
+              placeholder="Code postal"
+              value={cityId}
+              onChange={(e) => setCityId(e.target.value)}
+            />
+          <InputField
+              id="signup-phone-number"
+              name="phone-number"
+              type="text"
+              placeholder="Numéro de téléphone"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
           <InputField
             id="signup-password"
             name="password"

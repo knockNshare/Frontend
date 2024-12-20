@@ -1,0 +1,36 @@
+.results-list {
+    margin-top: 20px;
+    width: 100%;
+  }
+  
+  .results-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .results-list li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .results-list li:hover {
+    transform: translateY(-5px); /* Animation légère au hover */
+  }
+  
+  .results-list h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .results-list p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 14px;
+  }

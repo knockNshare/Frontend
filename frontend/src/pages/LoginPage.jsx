@@ -36,7 +36,15 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         alert("Connexion réussie !");
-        localStorage.setItem('token', response.data.token);
+
+        const { token, user } = response.data;
+
+        // Stocker le token dans localStorage
+        localStorage.setItem('token', token);
+
+        // Stocker l'ID utilisateur dans localStorage (ou dans un contexte global)
+        localStorage.setItem('userId', user.id);
+        
         login(); // pour l'état global
         navigate('/dashboard'); // ça redirige vers le dashboard après la connexion
       }
