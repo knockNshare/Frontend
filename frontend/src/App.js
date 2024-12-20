@@ -23,7 +23,7 @@ const App = () => {
         <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/" />} />
         {/* <Route path="/events" element={isAuthenticated ? <EventPage /> : <Navigate to="/" />} /> */}
         {/* eventpage test */}
-        <Route path="/events" element={!isAuthenticated ? <EventPage /> : <Navigate to="/" />} />
+        <Route path="/events" element={isAuthenticated ? <EventPage /> : <Navigate to="/" />} />
         {/* Page 404 */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
