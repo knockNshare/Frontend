@@ -20,7 +20,10 @@ function Dashboard() {
       {/* Section principale : Barre de recherche et résultats */}
       <main className="dashboard-main">
         <SearchFeature />
-      </main>
+        <Link to="/events" className="dashboard-events-link">
+        <button className="events-button">Voir les Événements</button>
+       </Link>
+</main>
 
       {/* Footer (optionnel) : Événements de solidarité */}
       <footer className="dashboard-footer">

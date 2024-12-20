@@ -40,3 +40,19 @@
     color: #007bff;
     text-decoration: none;
   }
+
+  .events-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 20px; /* Pour espacer du contenu précédent */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+.events-button:hover {
+    background-color: #218838;
+}
