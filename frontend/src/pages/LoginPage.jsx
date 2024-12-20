@@ -29,7 +29,7 @@ const LoginPage = () => {
 
     try {
       // pour envoyer les données email et password à l’API
-      const response = await axios.post('http://localhost:5001/api/login', {
+      const response = await axios.post('http://localhost:3000/api/login', {
         email,
         password,
       });
