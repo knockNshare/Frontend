@@ -25,7 +25,7 @@ function Dashboard() {
        </Link>
 </main>
 
-      {/* Footer (optionnel) : Événements de solidarité */}
+      {/* Footer : Événements de solidarité */}
       <footer className="dashboard-footer">
         <SolidarityEvents />
       </footer>

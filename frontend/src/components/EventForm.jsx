@@ -1,168 +1,150 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
-const EventForm = ({ onSubmit }) => {
+const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
+
+const EventForm = ({ onSubmit, userId }) => {
     const [formData, setFormData] = useState({
-        name: '',
+        title: '',
         description: '',
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        categories: [],
-        invitedMembers: [],
-        image: null,
+        date: '',
+        address: '',
+        latitude: '',
+        longitude: '',
+        category: categories[0], // Initialiser avec la première catégorie
+        creator_id: userId,
     });
 
-    const [showEndDate, setShowEndDate] = useState(false);
-    const [nameCharCount, setNameCharCount] = useState(0);
-    const [descriptionCharCount, setDescriptionCharCount] = useState(0);
+    const [addressValid, setAddressValid] = useState(null); // État pour l'adresse (true = valide, false = invalide)
+    const [loadingGeo, setLoadingGeo] = useState(false); // Indique si la géolocalisation est en cours
 
-    const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
+    // Fonction pour récupérer les coordonnées depuis l'adresse
+    const fetchCoordinates = async (address) => {
+        if (!address) return;
+        try {
+            setLoadingGeo(true);
+            const response = await axios.get(
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
+            );
+
+            if (response.data.length > 0) {
+                const { lat, lon } = response.data[0];
+                setFormData((prev) => ({
+                    ...prev,
+                    latitude: lat,
+                    longitude: lon,
+                }));
+                setAddressValid(true); // Adresse valide
+            } else {
+                setAddressValid(false); // Adresse invalide
+            }
+        } catch (error) {
+            console.error("Erreur lors de la récupération des coordonnées :", error);
+            setAddressValid(false);
+        } finally {
+            setLoadingGeo(false);
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.name) {
-            alert('Veuillez indiquer un titre à votre événement');
+        if (!formData.title || !formData.date || !formData.address) {
+            alert("Veuillez remplir tous les champs obligatoires.");
             return;
         }
 
-        if (!formData.startDate) {
-            alert('Veuillez sélectionner une date de début');
+        if (!addressValid) {
+            alert("Veuillez saisir une adresse valide.");
             return;
         }
 
         onSubmit(formData);
     };
 
-    const handleImageChange = (e) => {
-        setFormData({ ...formData, image: e.target.files[0] });
-    };
-
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 shadow rounded mb-4">
             <h2 className="text-lg font-semibold mb-2">Créer un Nouvel Événement</h2>
 
-            {/* Nom */}
-            <div className="relative mb-4">
+            {/* Titre */}
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">Titre :</label>
                 <input
                     type="text"
-                    maxLength="30"
-                    placeholder="Nom de l’événement"
-                    value={formData.name}
-                    onChange={(e) => {
-                        setFormData({ ...formData, name: e.target.value });
-                        setNameCharCount(e.target.value.length);
-                    }}
+                    placeholder="Titre de l'événement"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     className="border p-2 w-full rounded"
                 />
-                <span className="absolute bottom-1 right-2 text-xs text-gray-500">
-                    {nameCharCount}/30
-                </span>
             </div>
 
             {/* Description */}
-            <div className="relative mb-4">
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">Description :</label>
                 <textarea
-                    maxLength="4000"
-                    placeholder="Description"
+                    placeholder="Description de l'événement"
                     value={formData.description}
-                    onChange={(e) => {
-                        setFormData({ ...formData, description: e.target.value });
-                        setDescriptionCharCount(e.target.value.length);
-                    }}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="border p-2 w-full rounded"
-                />
-                <span className="absolute bottom-1 right-2 text-xs text-gray-500">
-                    {descriptionCharCount}/4000
-                </span>
+                ></textarea>
             </div>
 
-            {/* Dates et Heures */}
-            <div className="flex items-center mb-4">
-                <label className="mr-2 font-semibold">{showEndDate ? 'Du :' : 'Le :'}</label>
+            {/* Date */}
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">Date :</label>
                 <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="border p-2 rounded mr-2"
+                    type="datetime-local"
+                    value={formData.date}
+                    onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    className="border p-2 w-full rounded"
                 />
-                <input
-                    type="time"
-                    value={formData.startTime}
-                    onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                    className="border p-2 rounded mr-4"
-                    disabled={!formData.startDate}
-                />
+            </div>
 
-                <label className="flex items-center">
+            {/* Adresse */}
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">Adresse :</label>
+                <div className="relative">
                     <input
-                        type="checkbox"
-                        checked={showEndDate}
-                        onChange={() => {
-                            setShowEndDate(!showEndDate);
-                            if (!showEndDate) {
-                                setFormData({ ...formData, endDate: '', endTime: '' });
-                            }
+                        type="text"
+                        placeholder="Adresse"
+                        value={formData.address}
+                        onBlur={() => fetchCoordinates(formData.address)} // Appel API au blur
+                        onChange={(e) => {
+                            setFormData({ ...formData, address: e.target.value });
+                            setAddressValid(null); // Réinitialiser l'état
                         }}
-                        className="mr-2"
+                        className={`border p-2 w-full rounded ${
+                            addressValid === true
+                                ? 'border-green-500' // Bordure verte si valide
+                                : addressValid === false
+                                ? 'border-red-500' // Bordure rouge si invalide
+                                : ''
+                        }`}
                     />
-                    Ajouter une date de fin 
-                </label>
+                    {/* Icône de statut */}
+                    {addressValid === true && (
+                        <span className="absolute right-2 top-2 text-green-500">✅</span>
+                    )}
+                    {addressValid === false && (
+                        <span className="absolute right-2 top-2 text-red-500">❌</span>
+                    )}
+                </div>
+                {loadingGeo && <p className="text-blue-500 text-sm mt-1">Vérification de l'adresse...</p>}
             </div>
 
-            {showEndDate && (
-                <div className="flex items-center mb-4">
-                    <label className="mr-2 font-semibold">Au :</label>
-                    <input
-                        type="date"
-                        value={formData.endDate}
-                        onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                        className="border p-2 rounded mr-2"
-                    />
-                    <input
-                        type="time"
-                        value={formData.endTime}
-                        onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                        className="border p-2 rounded"
-                        disabled={!formData.endDate}
-                    />
-                </div>
-            )}
-
-            {/* Upload Image */}
+            {/* Catégorie */}
             <div className="mb-4">
-                <label className="font-semibold block mb-1">Image de présentation :</label>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
+                <label className="block font-semibold mb-1">Catégorie :</label>
+                <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="border p-2 w-full rounded"
-                />
-            </div>
-
-            {/* Catégories */}
-            <div className="mb-4">
-                <h3 className="font-semibold mb-2">Catégories :</h3>
-                <div className="grid grid-cols-2 gap-2">
+                >
                     {categories.map((category) => (
-                        <label key={category} className="flex items-center">
-                            <input
-                                type="checkbox"
-                                checked={formData.categories.includes(category)}
-                                onChange={() => {
-                                    setFormData((prev) => ({
-                                        ...prev,
-                                        categories: prev.categories.includes(category)
-                                            ? prev.categories.filter((c) => c !== category)
-                                            : [...prev.categories, category],
-                                    }));
-                                }}
-                                className="mr-2"
-                            />
+                        <option key={category} value={category}>
                             {category}
-                        </label>
+                        </option>
                     ))}
-                </div>
+                </select>
             </div>
 
             {/* Bouton */}
@@ -170,7 +152,7 @@ const EventForm = ({ onSubmit }) => {
                 type="submit"
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
             >
-                Créer l’événement
+                Créer l'événement
             </button>
         </form>
     );
