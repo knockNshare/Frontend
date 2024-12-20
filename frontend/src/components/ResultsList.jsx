@@ -39,9 +39,7 @@ const ResultsList = ({ results }) => {
     }
   };
 
-  if (results.length === 0) {
-    return <p className="results-list-empty">Aucun résultat trouvé.</p>;
-  }
+  
 
   return (
     <ul className="results-list">
