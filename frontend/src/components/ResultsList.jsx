@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import "../styles/ResultsList.css";
 
+//
 const ResultsList = ({ results }) => {
   const handleRequestInterest = async (propositionId) => {
     const userId = localStorage.getItem("userId");
