@@ -12,6 +12,7 @@ const SignupPage = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [cityId, setCityId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   // regex pour la force du mot de passe
@@ -32,15 +33,16 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrorMessage('');
   
     if (!name || !email || !phoneNumber || !password || !confirmPassword || !cityId) {
-      alert("Tous les champs doivent être remplis");
+      setErrorMessage("Tous les champs doivent être remplis.");
       setIsLoading(false);
       return;
     }
   
     if (password !== confirmPassword) {
-      alert("Les mots de passe ne correspondent pas");
+      setErrorMessage("Les mots de passe ne correspondent pas.");
       setIsLoading(false);
       return;
     }
@@ -49,7 +51,7 @@ const SignupPage = () => {
       const response = await axios.post('http://localhost:3000/api/signup', {
         name,
         email,
-        phone_number: phoneNumber, // Inclure le numéro de téléphone
+        phone_number: phoneNumber,
         password,
         city_id: cityId,
       });
@@ -59,16 +61,22 @@ const SignupPage = () => {
         navigate('/dashboard');
       }
     } catch (error) {
-      alert("Erreur lors de l'inscription. Veuillez réessayer.");
+      if (error.response && error.response.status === 409) {
+        setErrorMessage("Cette adresse email est déjà utilisée. Veuillez en choisir une autre.");
+      } else {
+        setErrorMessage("Erreur lors de l'inscription. Veuillez réessayer.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Inscription</h2>
+        {errorMessage && (
+          <p className="text-red-500 text-sm mb-4 text-center">{errorMessage}</p>
+        )}
         <form onSubmit={handleSubmit}>
           <InputField
             id="signup-name"
