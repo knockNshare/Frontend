@@ -8,17 +8,24 @@ const EventPage = () => {
     const [showForm, setShowForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
+    const [loading, setLoading] = useState(true); // Ajout d'un état pour le chargement
+    const [error, setError] = useState(null); // Ajout d'un état pour gérer les erreurs
     const userId = 1; // ID temporaire de l'utilisateur actuel
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
     // Charger les événements depuis l'API
     const fetchEvents = async () => {
+        setLoading(true); // Indiquer que le chargement commence
+        setError(null); // Réinitialiser les erreurs
         try {
             const response = await axios.get('http://localhost:3000/api/events');
             setEvents(response.data);
         } catch (error) {
             console.error('Erreur lors de la récupération des événements :', error);
+            setError('Impossible de charger les événements. Veuillez réessayer plus tard.');
+        } finally {
+            setLoading(false); // Indiquer que le chargement est terminé
         }
     };
 
@@ -100,6 +107,9 @@ const EventPage = () => {
                 </div>
             </div>
 
+            {loading && <p>Chargement des événements...</p>}
+            {error && <p className="text-red-500">{error}</p>}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredEvents.map((event) => (
                     <div key={event.id} className="bg-white p-4 shadow rounded">
@@ -127,6 +137,9 @@ const EventPage = () => {
                         )}
                     </div>
                 ))}
+                {!loading && !filteredEvents.length && !error && (
+                    <p className="text-gray-500 text-center col-span-3">Aucun événement trouvé.</p>
+                )}
             </div>
         </div>
     );
