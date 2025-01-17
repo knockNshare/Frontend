@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
@@ -9,52 +9,36 @@ const EventForm = ({ onSubmit, userId }) => {
         description: '',
         date: '',
         address: '',
-        latitude: '',
-        longitude: '',
+        city_id: '', // Nouveau champ pour city_id
         category: categories[0], // Initialiser avec la première catégorie
         creator_id: userId,
     });
 
-    const [addressValid, setAddressValid] = useState(null); // État pour l'adresse (true = valide, false = invalide)
-    const [loadingGeo, setLoadingGeo] = useState(false); // Indique si la géolocalisation est en cours
+    const [cities, setCities] = useState([]); // Liste des villes récupérées
+    const [loadingCities, setLoadingCities] = useState(true); // Indique si les villes sont en cours de chargement
+    const [errorCities, setErrorCities] = useState(null); // Erreur lors du chargement des villes
 
-    // Fonction pour récupérer les coordonnées depuis l'adresse
-    const fetchCoordinates = async (address) => {
-        if (!address) return;
+    // Charger les villes depuis le backend
+    const fetchCities = async () => {
         try {
-            setLoadingGeo(true);
-            const response = await axios.get(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`
-            );
-
-            if (response.data.length > 0) {
-                const { lat, lon } = response.data[0];
-                setFormData((prev) => ({
-                    ...prev,
-                    latitude: lat,
-                    longitude: lon,
-                }));
-                setAddressValid(true); // Adresse valide
-            } else {
-                setAddressValid(false); // Adresse invalide
-            }
+            const response = await axios.get('http://localhost:3000/cities');
+            setCities(response.data); // Met à jour la liste des villes
         } catch (error) {
-            console.error("Erreur lors de la récupération des coordonnées :", error);
-            setAddressValid(false);
+            console.error("Erreur lors de la récupération des villes :", error);
+            setErrorCities("Impossible de charger les villes. Veuillez réessayer.");
         } finally {
-            setLoadingGeo(false);
+            setLoadingCities(false);
         }
     };
 
+    useEffect(() => {
+        fetchCities(); // Charger les villes à l'ouverture du formulaire
+    }, []);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.title || !formData.date || !formData.address) {
+        if (!formData.title || !formData.date || !formData.address || !formData.city_id) {
             alert("Veuillez remplir tous les champs obligatoires.");
-            return;
-        }
-
-        if (!addressValid) {
-            alert("Veuillez saisir une adresse valide.");
             return;
         }
 
@@ -102,33 +86,36 @@ const EventForm = ({ onSubmit, userId }) => {
             {/* Adresse */}
             <div className="mb-4">
                 <label className="block font-semibold mb-1">Adresse :</label>
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Adresse"
-                        value={formData.address}
-                        onBlur={() => fetchCoordinates(formData.address)} // Appel API au blur
-                        onChange={(e) => {
-                            setFormData({ ...formData, address: e.target.value });
-                            setAddressValid(null); // Réinitialiser l'état
-                        }}
-                        className={`border p-2 w-full rounded ${
-                            addressValid === true
-                                ? 'border-green-500' // Bordure verte si valide
-                                : addressValid === false
-                                ? 'border-red-500' // Bordure rouge si invalide
-                                : ''
-                        }`}
-                    />
-                    {/* Icône de statut */}
-                    {addressValid === true && (
-                        <span className="absolute right-2 top-2 text-green-500">✅</span>
-                    )}
-                    {addressValid === false && (
-                        <span className="absolute right-2 top-2 text-red-500">❌</span>
-                    )}
-                </div>
-                {loadingGeo && <p className="text-blue-500 text-sm mt-1">Vérification de l'adresse...</p>}
+                <input
+                    type="text"
+                    placeholder="Adresse"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="border p-2 w-full rounded"
+                />
+            </div>
+
+            {/* Ville (city_id) */}
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">Ville :</label>
+                {loadingCities ? (
+                    <p className="text-blue-500">Chargement des villes...</p>
+                ) : errorCities ? (
+                    <p className="text-red-500">{errorCities}</p>
+                ) : (
+                    <select
+                        value={formData.city_id}
+                        onChange={(e) => setFormData({ ...formData, city_id: e.target.value })}
+                        className="border p-2 w-full rounded"
+                    >
+                        <option value="">-- Sélectionner une ville --</option>
+                        {cities.map((city) => (
+                            <option key={city.id} value={city.id}>
+                                {city.name} ({city.id})
+                            </option>
+                        ))}
+                    </select>
+                )}
             </div>
 
             {/* Catégorie */}
