@@ -8,7 +8,7 @@ import SignupPage from './pages/SignupPage';
 import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
 import EventPage from './pages/EventPage';
-import Navbar from './components/NavBar';
+import Navbar from './components/Navbar';
 
 
 const App = () => {
