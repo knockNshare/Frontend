@@ -1,33 +1,31 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import "../styles/Dashboard.css"; // Importation du CSS
+import "../styles/Dashboard.css"; // Nouveau style propre et épuré
 import SearchFeature from "../components/SearchFeature";
-import Notifications from "../components/Notifications";
-import UserProfile from "./UserProfile";
 import SolidarityEvents from "../components/SolidarityEvents";
 
 function Dashboard() {
   return (
     <div className="dashboard">
-      {/* Header : Profil utilisateur et notifications */}
       <header className="dashboard-header">
-        <Link to="/profile" className="dashboard-profile-link"> {/* Ajoute un lien */}
-          <button className="profile-button">Mon Profil</button>
-        </Link>
-        <Notifications />
+        <h1>🏠 Mon Dashboard</h1>
       </header>
 
-      {/* Section principale : Barre de recherche et résultats */}
       <main className="dashboard-main">
-        <SearchFeature />
-        <Link to="/events" className="dashboard-events-link">
-        <button className="events-button">Voir les Événements</button>
-       </Link>
-</main>
+        {/* Barre de recherche */}
+        <section className="dashboard-section">
+          <SearchFeature />
+        </section>
 
-      {/* Footer : Événements de solidarité */}
+        {/* Accès aux événements */}
+        <section className="dashboard-section">
+          <h2>📅 Événements Communautaires</h2>
+          
+        </section>
+      </main>
+
       <footer className="dashboard-footer">
-        <SolidarityEvents />
+       
       </footer>
     </div>
   );

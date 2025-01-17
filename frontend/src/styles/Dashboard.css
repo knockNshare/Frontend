@@ -1,58 +1,66 @@
+/* 🌟 Style général */
 .dashboard {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: #f0f2f5; 
-    font-family: 'Arial', sans-serif; /* Ajout pour uniformiser la typographie */
-    color: #333; /* Défaut pour le texte global */
-  }
-  
-  .dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background-color: #007bff;
-    color: #fff;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .dashboard-main {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background-color: #fff; /* Couleur blanche pour contraster les sections */
-    border-radius: 8px; /* Ajout d'arrondis pour un design moderne */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Ombre douce */
-  }
-  
-
-  
-  /* Footer */
-  .dashboard-footer {
-    background-color: #333;
-    color: white;
-    padding: 20px 30px;
-    text-align: center;
-  }
-  
-  .dashboard-footer a {
-    color: #007bff;
-    text-decoration: none;
-  }
-
-  .events-button {
-    background-color: #28a745;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 20px; /* Pour espacer du contenu précédent */
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8f9fa; /* Fond clair et élégant */
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  padding-top: 60px; /* Ajustement pour la navbar fixe */
 }
-.events-button:hover {
-    background-color: #218838;
+
+/* 🏠 Header */
+.dashboard-header {
+  text-align: center;
+  font-size: 22px;
+  padding: 15px;
+  background: #222;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 🎯 Sections principales */
+.dashboard-main {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+/* 📌 Style des sections */
+.dashboard-section {
+  width: 80%;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* 🎯 Bouton voir événements */
+.dashboard-button {
+  background-color: #28a745;
+  color: white;
+  font-size: 16px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.dashboard-button:hover {
+  background-color: #218838;
+}
+
+/* 🏁 Footer */
+.dashboard-footer {
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
 }

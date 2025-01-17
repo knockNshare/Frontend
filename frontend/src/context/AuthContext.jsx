@@ -1,28 +1,26 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 
+// Création du contexte d'authentification
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    !!localStorage.getItem('token') // Si un token est présent, on considère l'utilisateur connecté (TODO: vérifier si le token est encore valide)
-  );
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = (token) => {
+  useEffect(() => {
+    // Vérifier si un userId est stocké dans localStorage
+    const user = localStorage.getItem("userId");
+    setIsAuthenticated(!!user);
+  }, []);
+
+  const login = (userId) => {
+    localStorage.setItem("userId", userId);
     setIsAuthenticated(true);
-    localStorage.setItem('token', token); // token stocké
   };
 
   const logout = () => {
+    localStorage.removeItem("userId");
     setIsAuthenticated(false);
-    localStorage.removeItem('token'); // token supprimé au moment de la déconnexion
   };
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true); // Si un token existe, l'utilisateur est authentifié
-    }
-  }, []);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>

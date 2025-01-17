@@ -8,22 +8,36 @@ import SignupPage from './pages/SignupPage';
 import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
 import EventPage from './pages/EventPage';
-
+import Navbar from "./components/Navbar";
 
 const App = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth(); // Gestion d'authentification propre
 
   return (
     <Router>
+      {/* Affiche la Navbar uniquement si l'utilisateur est connecté */}
+      {isAuthenticated && <Navbar />}
+
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />} />
-        <Route path="/signup" element={isAuthenticated ? <Navigate to="/dashboard" /> : <SignupPage />} />
-        <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} />
-        <Route path="/profile" element={isAuthenticated ? <UserProfile /> : <Navigate to="/" />} />
-        <Route path="/events" element={isAuthenticated ? <EventPage /> : <Navigate to="/" />} />
-        {/* Page 404 */}
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* Pages accessibles sans être connecté */}
+        {!isAuthenticated ? (
+          <>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            {/* Redirection vers home si un utilisateur non connecté tente d'accéder à une page protégée */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </>
+        ) : (
+          <>
+            {/* Pages accessibles uniquement si connecté */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<UserProfile />} />
+            <Route path="/events" element={<EventPage />} />
+            {/* Redirection vers le dashboard si un utilisateur connecté tente d'accéder à la page d'accueil */}
+            <Route path="*" element={<Navigate to="/dashboard" />} />
+          </>
+        )}
       </Routes>
     </Router>
   );

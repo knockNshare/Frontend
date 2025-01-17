@@ -11,9 +11,6 @@ function UserProfile() {
     <div className="user-profile">
       {/* Header avec le bouton et le titre */}
       <div className="user-profile-header">
-        <Link to="/dashboard" className="dashboard-profile-link">
-          <button className="profile-button">Retourner au Dashboard</button>
-        </Link>
         <h1>Mon Profil</h1>
       </div>
 
