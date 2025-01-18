@@ -5,27 +5,34 @@ import axios from 'axios';
 
 const EventPage = () => {
     const [events, setEvents] = useState([]);
+    const [cities, setCities] = useState([]); // Liste des villes disponibles
+    const [selectedCityId, setSelectedCityId] = useState(''); // Ville sélectionnée pour filtrer
     const [showForm, setShowForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
-    const [loading, setLoading] = useState(true); // Ajout d'un état pour le chargement
-    const [error, setError] = useState(null); // Ajout d'un état pour gérer les erreurs
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const userId = 1; // ID temporaire de l'utilisateur actuel
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
-    // Charger les événements depuis l'API
-    const fetchEvents = async () => {
-        setLoading(true); // Indiquer que le chargement commence
-        setError(null); // Réinitialiser les erreurs
+    // Charger les événements et les villes depuis le backend
+    const fetchData = async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const response = await axios.get('http://localhost:3000/api/events');
-            setEvents(response.data);
+            // Récupérer tous les événements
+            const eventsResponse = await axios.get('http://localhost:3000/api/events');
+            setEvents(eventsResponse.data);
+
+            // Récupérer la liste des villes
+            const citiesResponse = await axios.get('http://localhost:3000/cities');
+            setCities(citiesResponse.data);
         } catch (error) {
-            console.error('Erreur lors de la récupération des événements :', error);
-            setError('Impossible de charger les événements. Veuillez réessayer plus tard.');
+            console.error('Erreur lors de la récupération des données :', error);
+            setError('Impossible de charger les données. Veuillez réessayer plus tard.');
         } finally {
-            setLoading(false); // Indiquer que le chargement est terminé
+            setLoading(false);
         }
     };
 
@@ -44,23 +51,18 @@ const EventPage = () => {
     };
 
     useEffect(() => {
-        fetchEvents();
+        fetchData();
     }, []);
 
-    // Fonction pour formater la date en DD/MM/YYYY
-    const formatDate = (dateString) => {
-        if (!dateString) return null;
-        const [year, month, day] = dateString.split('-');
-        return `${day}/${month}/${year}`;
-    };
-
+    // Fonction pour filtrer les événements par catégorie, recherche et ville
     const filteredEvents = events.filter((event) => {
         const matchesSearch =
             event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             event.description.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory =
             selectedCategories.length === 0 || selectedCategories.some((cat) => event.category.includes(cat));
-        return matchesSearch && matchesCategory;
+        const matchesCity = !selectedCityId || String(event.city_id) === String(selectedCityId);
+        return matchesSearch && matchesCategory && matchesCity;
     });
 
     return (
@@ -84,26 +86,49 @@ const EventPage = () => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="border p-2 w-full rounded mb-2"
                 />
-                <div className="flex flex-wrap gap-2">
-                    {categories.map((category) => (
-                        <button
-                            key={category}
-                            onClick={() =>
-                                setSelectedCategories((prev) =>
-                                    prev.includes(category)
-                                        ? prev.filter((cat) => cat !== category)
-                                        : [...prev, category]
-                                )
-                            }
-                            className={`px-4 py-2 rounded ${
-                                selectedCategories.includes(category)
-                                    ? 'bg-blue-500 text-white'
-                                    : 'bg-gray-200 text-gray-700'
-                            }`}
+
+                {/* Conteneur flex pour aligner les catégories et le menu déroulant */}
+                <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap gap-2">
+                        {categories.map((category) => (
+                            <button
+                                key={category}
+                                onClick={() =>
+                                    setSelectedCategories((prev) =>
+                                        prev.includes(category)
+                                            ? prev.filter((cat) => cat !== category)
+                                            : [...prev, category]
+                                    )
+                                }
+                                className={`px-4 py-2 rounded ${
+                                    selectedCategories.includes(category)
+                                        ? 'bg-blue-500 text-white'
+                                        : 'bg-gray-200 text-gray-700'
+                                }`}
+                            >
+                                {category}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="ml-4">
+                        <label htmlFor="city-filter" className="block mb-1 font-bold">
+                            Filtrer par ville :
+                        </label>
+                        <select
+                            id="city-filter"
+                            value={selectedCityId}
+                            onChange={(e) => setSelectedCityId(e.target.value)}
+                            className="border p-2 rounded w-60" // Fixe la largeur du menu déroulant
                         >
-                            {category}
-                        </button>
-                    ))}
+                            <option value="">Toutes les villes</option>
+                            {cities.map((city) => (
+                                <option key={city.id} value={city.id}>
+                                    {city.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 
