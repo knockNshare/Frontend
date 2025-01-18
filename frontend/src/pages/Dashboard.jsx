@@ -1,8 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import "../styles/Dashboard.css"; // Nouveau style propre et épuré
+
+import "../styles/Dashboard.css"; 
 import SearchFeature from "../components/SearchFeature";
-import SolidarityEvents from "../components/SolidarityEvents";
+
 
 function Dashboard() {
   return (

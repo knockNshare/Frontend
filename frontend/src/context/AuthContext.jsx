@@ -1,29 +1,43 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-// Création du contexte d'authentification
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Vérifier si un userId est stocké dans localStorage
-    const user = localStorage.getItem("userId");
-    setIsAuthenticated(!!user);
+    const storedUserId = localStorage.getItem("userId");
+
+    console.log("📌 Vérification initiale userId dans localStorage :", storedUserId);
+
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+
+    setLoading(false);
   }, []);
 
-  const login = (userId) => {
-    localStorage.setItem("userId", userId);
-    setIsAuthenticated(true);
+  // 🔄 Met à jour `userId` à chaque changement dans localStorage
+  const login = (newUserId) => {
+    console.log("🔄 Mise à jour du contexte avec userId :", newUserId);
+    localStorage.setItem("userId", newUserId);
+    setUserId(newUserId);
   };
 
+  // ✅ Correction logout
   const logout = () => {
+    console.log("🚪 Déconnexion...");
     localStorage.removeItem("userId");
-    setIsAuthenticated(false);
+    setUserId(null);
   };
+
+  if (loading) {
+    return <div>Chargement de l'authentification...</div>;
+  }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ userId, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

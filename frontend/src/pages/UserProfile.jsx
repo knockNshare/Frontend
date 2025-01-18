@@ -1,30 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useLocation } from 'react-router-dom';
 import "../styles/UserProfile.css";
-import { Link } from "react-router-dom";
 import DeclareProposition from "../components/DeclareProposition";
 import PropositionsList from "../components/PropositionsList";
-import InterestsList from "../components/InterestsList.jsx";
-import TransactionsList from "../components/TransactionsList";
+import InterestsList from "../components/InterestsList";
+import SentInterests from "../components/SentInterests";
 
 function UserProfile() {
+  const location = useLocation();
+  const highlightId = new URLSearchParams(location.search).get("highlight");
+
+  useEffect(() => {
+    console.log("📌 URL Paramètre highlightId reçu :", highlightId);
+  }, [highlightId]);
+
   return (
     <div className="user-profile">
-      {/* Header avec le bouton et le titre */}
       <div className="user-profile-header">
-        <h1>Mon Profil</h1>
+        <h1>👤 Mon Profil</h1>
       </div>
 
-      {/* Section Déclaration */}
       <DeclareProposition />
-
-      {/* Section Propositions */}
       <PropositionsList />
 
-      {/* Section Intérêts Reçus : toutes les demandes d’intérêt reçues par l’utilisateur pour ses propres propositions.(offreur) */}
-      <InterestsList />
+      <InterestsList highlightId={highlightId} />
 
-      {/* Section Ce que je veux emprunter aux gens : montre toutes les demandes d’intérêt envoyées par l’utilisateur en tant qu’intéressé (intéressé)*/}
-      <TransactionsList />
+      <div id="sent_interests">
+        <SentInterests />
+      </div>
     </div>
   );
 }

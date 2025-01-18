@@ -16,7 +16,14 @@ function PropositionsList() {
         }
 
         const response = await axios.get(`http://localhost:3000/propositions/users/${userId}`);
-        setPropositions(response.data.data);
+
+        if (response.data.error) {
+          console.warn("⚠️ Aucune proposition trouvée.");
+          setPropositions([]); // Évite l'erreur
+        } else {
+          setPropositions(response.data.data || []);
+        }
+
         setError(null);
       } catch (error) {
         console.error("Erreur lors de la récupération des propositions :", error);

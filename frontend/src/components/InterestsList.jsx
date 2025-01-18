@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "../styles/InterestsList.css";
+import io from "socket.io-client";
 
-function InterestsList() {
+const socket = io("http://localhost:5001");
+
+function InterestsList({ highlightId }) { // 🔥 highlightId reçu depuis UserProfile.jsx
   const [interests, setInterests] = useState([]);
   const [error, setError] = useState(null);
+  const highlightRef = useRef(null);
 
   useEffect(() => {
     const fetchInterests = async () => {
@@ -27,31 +31,55 @@ function InterestsList() {
     fetchInterests();
   }, []);
 
-  const handleAction = async (interestId, action) => {
-    try {
-      const response = await axios.put(`http://localhost:3000/interests/${interestId}`, {
-        status: action, // "accepted" ou "rejected"
-      });
+  // 🔥 Correction : Le scroll ne s'effectue qu'une fois que les intérêts sont chargés
+  useEffect(() => {
+    if (highlightId) {
+      const elementToHighlight = document.getElementById(`interest-${highlightId}`);
+      if (elementToHighlight) {
+        console.log("📌 Scrolling vers l'intérêt ID :", highlightId);
+        elementToHighlight.scrollIntoView({ behavior: "smooth", block: "center" });
 
-      setInterests((prevInterests) =>
-        prevInterests.map((interest) =>
-          interest.id === interestId ? { ...interest, status: action } : interest
-        )
-      );
-
-     // alert(response.data.message);
-    } catch (error) {
-      console.error("Erreur lors de la mise à jour de l'intérêt :", error);
-      alert("Une erreur est survenue lors de la mise à jour de l'intérêt.");
+        elementToHighlight.classList.add("highlight");
+        setTimeout(() => elementToHighlight.classList.remove("highlight"), 3000);
+      }
     }
-  };
+  }, [highlightId, interests]);
 
+  // 🔥 Fonction pour accepter ou refuser un intérêt
+  const handleAction = async (interestId, action, interestedUserId, title) => {
+    try {
+        const response = await axios.put(`http://localhost:3000/interests/${interestId}`, { status: action });
+
+        // 🔥 Si accepté, récupérer les contacts du proposeur
+        if (action === "accepted") {
+            const { data } = await axios.get(`http://localhost:3000/users/${interestedUserId}/contact`);
+            
+            setInterests((prev) =>
+                prev.map((interest) =>
+                    interest.id === interestId
+                        ? { ...interest, status: action, proposerContact: data }
+                        : interest
+                )
+            );
+        } else {
+            setInterests((prev) =>
+                prev.map((interest) =>
+                    interest.id === interestId ? { ...interest, status: action } : interest
+                )
+            );
+        }
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour de l'intérêt :", error);
+        alert("Une erreur est survenue lors de la mise à jour de l'intérêt.");
+    }
+};
+
+  // 🔥 Fonction pour récupérer les contacts après acceptation
   const fetchContact = async (interestId, userId) => {
     try {
       const response = await axios.get(`http://localhost:3000/users/${userId}/contact`);
       const contact = response.data.data;
 
-      // Mettre à jour l'état local avec les coordonnées
       setInterests((prevInterests) =>
         prevInterests.map((interest) =>
           interest.id === interestId ? { ...interest, contact } : interest
@@ -72,30 +100,24 @@ function InterestsList() {
           <p>Aucun intérêt reçu pour le moment.</p>
         ) : (
           interests.map((interest) => (
-            <li key={interest.id} className="interests-item">
+            <li
+              key={interest.id}
+              id={`interest-${interest.id}`}
+              className={`interests-item ${highlightId == interest.id ? "highlight" : ""}`}
+            >
               <div>
                 <strong>{interest.proposition_title}</strong>
-                <p>
-                  {interest.interested_user_name} ({interest.interested_user_email})
-                </p>
-                <p>
-                  <small>Statut : {interest.status}</small>
-                </p>
+                <p>{interest.interested_user_name} ({interest.interested_user_email})</p>
+                <p><small>Statut : {interest.status}</small></p>
               </div>
               <div className="actions">
                 {interest.status === "pending" && (
                   <>
-                    <button
-                      className="accept-btn"
-                      onClick={() => handleAction(interest.id, "accepted")}
-                    >
-                      Accepter
+                    <button className="accept-btn" onClick={() => handleAction(interest.id, "accepted", interest.interested_user_id, interest.proposition_title)}>
+                      ✅ Accepter
                     </button>
-                    <button
-                      className="reject-btn"
-                      onClick={() => handleAction(interest.id, "rejected")}
-                    >
-                      Refuser
+                    <button className="reject-btn" onClick={() => handleAction(interest.id, "rejected", interest.interested_user_id, interest.proposition_title)}>
+                      ❌ Refuser
                     </button>
                   </>
                 )}
