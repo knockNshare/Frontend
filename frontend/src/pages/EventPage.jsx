@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import EventForm from '../components/EventForm';
+import EventDetails from '../components/EventDetails'; // Nouveau composant
 import DefaultImage from '../assets/default-eventpic.jpg';
 import axios from 'axios';
 
@@ -8,6 +9,8 @@ const EventPage = () => {
     const [cities, setCities] = useState([]);
     const [selectedCityId, setSelectedCityId] = useState('');
     const [showForm, setShowForm] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -16,6 +19,7 @@ const EventPage = () => {
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
+    // Charger les événements et les villes depuis le backend
     const fetchData = async () => {
         setLoading(true);
         setError(null);
@@ -33,6 +37,18 @@ const EventPage = () => {
         }
     };
 
+    // Charger les détails d'un événement
+    const fetchEventDetails = async (eventId) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/events/${eventId}`);
+            setSelectedEvent(response.data);
+            setShowDetails(true);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des détails de l\'événement :', error);
+        }
+    };
+
+    // Ajouter un événement
     const addEvent = async (newEvent) => {
         try {
             const response = await axios.post('http://localhost:3000/api/events', {
@@ -41,8 +57,10 @@ const EventPage = () => {
             });
             setEvents([...events, { ...newEvent, id: response.data.event_id }]);
             setShowForm(false);
+            alert('Événement créé avec succès !');
         } catch (error) {
             console.error('Erreur lors de la création de l\'événement :', error);
+            alert('Erreur lors de la création de l\'événement.');
         }
     };
 
@@ -71,7 +89,6 @@ const EventPage = () => {
                 + Créer un événement
             </button>
 
-            {/* Overlay pour le formulaire */}
             {showForm && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
@@ -82,6 +99,20 @@ const EventPage = () => {
                             ✖
                         </button>
                         <EventForm onSubmit={addEvent} userId={userId} />
+                    </div>
+                </div>
+            )}
+
+            {showDetails && selectedEvent && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                        <button
+                            onClick={() => setShowDetails(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                        >
+                            ✖
+                        </button>
+                        <EventDetails event={selectedEvent} />
                     </div>
                 </div>
             )}
@@ -144,7 +175,11 @@ const EventPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredEvents.map((event) => (
-                    <div key={event.id} className="bg-white p-4 shadow rounded">
+                    <div
+                        key={event.id}
+                        className="bg-white p-4 shadow rounded cursor-pointer"
+                        onClick={() => fetchEventDetails(event.id)}
+                    >
                         <img
                             src={event.imageURL || DefaultImage}
                             alt={event.title}
@@ -159,19 +194,8 @@ const EventPage = () => {
                         <p className="text-sm text-gray-500 mb-2">
                             {`Date : ${new Date(event.date).toLocaleString()}`}
                         </p>
-                        <p className="text-sm text-gray-500 mb-2">
-                            {`Adresse : ${event.address}`}
-                        </p>
-                        {event.category && (
-                            <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm">
-                                {event.category}
-                            </span>
-                        )}
                     </div>
                 ))}
-                {!loading && !filteredEvents.length && !error && (
-                    <p className="text-gray-500 text-center col-span-3">Aucun événement trouvé.</p>
-                )}
             </div>
         </div>
     );

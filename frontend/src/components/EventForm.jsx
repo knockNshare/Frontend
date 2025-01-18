@@ -32,18 +32,17 @@ const EventForm = ({ onSubmit, userId }) => {
         }
     };
 
-    const handleImageValidation = async () => {
-        if (!formData.imageURL) return;
+    const validateImageURL = async () => {
+        if (!formData.imageURL) return true;
 
         try {
-            const response = await fetch(formData.imageURL);
-            if (!response.ok) {
-                throw new Error('Invalid image');
-            }
-        } catch {
-            setErrorImage('Impossible de charger l\'image. Une image par défaut sera utilisée.');
-            setFormData({ ...formData, imageURL: '' }); // Réinitialise l'URL si invalide
-            setTimeout(() => setErrorImage(null), 5000); // Efface le message après 5 secondes
+            const response = await axios.get('http://localhost:3000/api/validate-image', {
+                params: { url: formData.imageURL },
+            });
+            return response.data.valid;
+        } catch (error) {
+            console.error("Erreur lors de la validation de l'image :", error);
+            return false;
         }
     };
 
@@ -53,11 +52,19 @@ const EventForm = ({ onSubmit, userId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await handleImageValidation(); // Valider l'image avant soumission
+        const isImageValid = await validateImageURL();
+
+        if (!isImageValid) {
+            setErrorImage("Impossible de charger l'image. Une image par défaut sera utilisée.");
+            setFormData({ ...formData, imageURL: '' }); // Réinitialise l'URL si invalide
+            setTimeout(() => setErrorImage(null), 5000); // Efface le message après 5 secondes
+        }
+
         if (!formData.title || !formData.date || !formData.address || !formData.city_id) {
             alert("Veuillez remplir tous les champs obligatoires.");
             return;
         }
+
         onSubmit(formData);
     };
 
