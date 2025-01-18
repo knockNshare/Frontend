@@ -1,0 +1,55 @@
+/* 💌 Liste des intérêts envoyés */
+.interests-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 🎨 Style de chaque demande */
+.interests-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease-in-out;
+}
+
+/* 🟡 Statut En attente */
+.status-pending {
+    border-left: 6px solid #f7b731;
+}
+
+/* 🟢 Statut Accepté */
+.status-accepted {
+    border-left: 6px solid #28a745;
+}
+
+/* 🔴 Statut Refusé */
+.status-rejected {
+    border-left: 6px solid #dc3545;
+}
+
+/* ✨ Amélioration de l’affichage */
+.interest-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.interest-status {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.contact-info {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    background: #e9ecef;
+    padding: 8px;
+    border-radius: 5px;
+    color: #333;
+}
