@@ -5,27 +5,24 @@ import axios from 'axios';
 
 const EventPage = () => {
     const [events, setEvents] = useState([]);
-    const [cities, setCities] = useState([]); // Liste des villes disponibles
-    const [selectedCityId, setSelectedCityId] = useState(''); // Ville sélectionnée pour filtrer
+    const [cities, setCities] = useState([]);
+    const [selectedCityId, setSelectedCityId] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const userId = 1; // ID temporaire de l'utilisateur actuel
+    const userId = 1; // ID temporaire
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
-    // Charger les événements et les villes depuis le backend
     const fetchData = async () => {
         setLoading(true);
         setError(null);
         try {
-            // Récupérer tous les événements
             const eventsResponse = await axios.get('http://localhost:3000/api/events');
             setEvents(eventsResponse.data);
 
-            // Récupérer la liste des villes
             const citiesResponse = await axios.get('http://localhost:3000/cities');
             setCities(citiesResponse.data);
         } catch (error) {
@@ -36,7 +33,6 @@ const EventPage = () => {
         }
     };
 
-    // Ajouter un événement
     const addEvent = async (newEvent) => {
         try {
             const response = await axios.post('http://localhost:3000/api/events', {
@@ -54,7 +50,6 @@ const EventPage = () => {
         fetchData();
     }, []);
 
-    // Fonction pour filtrer les événements par catégorie, recherche et ville
     const filteredEvents = events.filter((event) => {
         const matchesSearch =
             event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,13 +65,26 @@ const EventPage = () => {
             <h1 className="text-2xl font-bold mb-4">Gestion des Événements</h1>
 
             <button
-                onClick={() => setShowForm(!showForm)}
+                onClick={() => setShowForm(true)}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4"
             >
                 + Créer un événement
             </button>
 
-            {showForm && <EventForm onSubmit={addEvent} userId={userId} />}
+            {/* Overlay pour le formulaire */}
+            {showForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                        <button
+                            onClick={() => setShowForm(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                        >
+                            ✖
+                        </button>
+                        <EventForm onSubmit={addEvent} userId={userId} />
+                    </div>
+                </div>
+            )}
 
             <div className="mb-4">
                 <input
@@ -87,7 +95,6 @@ const EventPage = () => {
                     className="border p-2 w-full rounded mb-2"
                 />
 
-                {/* Conteneur flex pour aligner les catégories et le menu déroulant */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-2">
                         {categories.map((category) => (
@@ -119,7 +126,7 @@ const EventPage = () => {
                             id="city-filter"
                             value={selectedCityId}
                             onChange={(e) => setSelectedCityId(e.target.value)}
-                            className="border p-2 rounded w-60" // Fixe la largeur du menu déroulant
+                            className="border p-2 rounded w-60"
                         >
                             <option value="">Toutes les villes</option>
                             {cities.map((city) => (
