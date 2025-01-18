@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
-import { Link, useNavigate, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -9,47 +9,44 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login } = useAuth(); // 🔥 On récupère login depuis AuthContext
   const [isLoading, setIsLoading] = useState(false);
-  const { isAuthenticated, login } = useAuth();
-
-  // On redirige si le membre est déjà authentifié
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     if (!email || !password) {
-      alert("Tous les champs doivent être remplis");
+      alert("⚠️ Tous les champs doivent être remplis !");
       setIsLoading(false);
       return;
     }
 
     try {
-      // pour envoyer les données email et password à l’API
-      const response = await axios.post('http://localhost:3000/api/login', {
-        email,
-        password,
-      });
+      // 🔥 Envoi des identifiants au backend
+      const response = await axios.post('http://localhost:3000/api/login', { email, password });
 
       if (response.status === 200) {
-        alert("Connexion réussie !");
+        alert("✅ Connexion réussie !");
+        const { user } = response.data;
 
-        const { token, user } = response.data;
+        console.log("📌 ID utilisateur reçu du backend :", user.id);
 
-        // Stocker le token dans localStorage
-        localStorage.setItem('token', token);
+        // 🔥 Stocke immédiatement userId dans localStorage
+        localStorage.setItem("userId", user.id);
 
-        // Stocker l'ID utilisateur dans localStorage (ou dans un contexte global)
-        localStorage.setItem('userId', user.id);
-        
-        login(); // pour l'état global
-        navigate('/dashboard'); // ça redirige vers le dashboard après la connexion
+        // 🔄 Rafraîchit l'AuthContext
+        login(user.id);
+
+        // ✅ Vérification après stockage
+        console.log("📌 Vérification après stockage, userId =", localStorage.getItem("userId"));
+
+        // 🚀 Redirige vers le dashboard
+        navigate('/dashboard');
       }
     } catch (error) {
-      alert("Erreur lors de la connexion. Veuillez réessayer, avec des identifiants valides.");
+      console.error("❌ Erreur lors de la connexion :", error);
+      alert("❌ Erreur lors de la connexion. Vérifiez vos identifiants.");
     } finally {
       setIsLoading(false);
     }

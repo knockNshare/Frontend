@@ -1,43 +1,49 @@
 import React from "react";
 import axios from "axios";
 import "../styles/ResultsList.css";
+import io from "socket.io-client";
+const socket = io("http://localhost:5001"); // Connecter le socket
 
-//
+// Composant ResultsList pour envoyer une demande d'intérêt
 const ResultsList = ({ results }) => {
+  
+  
   const handleRequestInterest = async (propositionId) => {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      alert("Vous devez être connecté pour effectuer cette action.");
-      return;
-    }
-
-    // Demander confirmation
-    const userConfirmation = window.confirm(
-      "En envoyant cette demande, vos informations de contact (numéro de téléphone et email) seront communiquées à l'offreur. Voulez-vous continuer ?"
-    );
-
-    if (!userConfirmation) {
-      // L'utilisateur a annulé l'action
-      return;
-    }
-
-    // Obtenir la date actuelle en UTC et la convertir au format MySQL
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().slice(0, 19).replace("T", " ");
-
-    try {
-      const response = await axios.post("http://localhost:3000/interests", {
-        proposition_id: propositionId,
-        interested_user_id: userId,
-        start_date: formattedDate,
-        end_date: null, // Si end_date n'est pas nécessaire, on peut laisser null
-      });
-      alert("Demande d'intérêt envoyée avec succès !");
-    } catch (error) {
-      console.error("Erreur lors de l'envoi de la demande d'intérêt :", error);
-      alert(error.response?.data?.error || "Une erreur est survenue.");
-    }
+      const userId = localStorage.getItem("userId");
+  
+      if (!userId) {
+          alert("Vous devez être connecté pour effectuer cette action.");
+          return;
+      }
+  
+      const userConfirmation = window.confirm(
+          "En envoyant cette demande, vos informations de contact (numéro de téléphone et email) seront communiquées à l'offreur. Voulez-vous continuer ?"
+      );
+  
+      if (!userConfirmation) return;
+  
+      try {
+          const response = await axios.post("http://localhost:3000/interests", {
+              proposition_id: propositionId,
+              interested_user_id: userId,
+              start_date: new Date().toISOString().slice(0, 19).replace("T", " "),
+          });
+  
+          // Récupérer l'ID du proposeur
+          const proposeurId = response.data.proposer_id; 
+  
+          // Envoyer la notification en temps réel
+          socket.emit("send-notification", {
+              user_id: proposeurId,
+              message: "Quelqu'un est intéressé par votre annonce !",
+              related_entity_id: propositionId,
+          });
+  
+          alert("Demande d'intérêt envoyée avec succès !");
+      } catch (error) {
+          console.error("Erreur lors de l'envoi de la demande d'intérêt :", error);
+          alert(error.response?.data?.error || "Une erreur est survenue.");
+      }
   };
 
   

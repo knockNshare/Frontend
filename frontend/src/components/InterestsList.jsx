@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/InterestsList.css";
+import io from "socket.io-client";
+const socket = io("http://localhost:5001");
 
 function InterestsList() {
   const [interests, setInterests] = useState([]);
@@ -27,24 +29,35 @@ function InterestsList() {
     fetchInterests();
   }, []);
 
-  const handleAction = async (interestId, action) => {
+  const handleAction = async (interestId, action, interestedUserId, title) => {
     try {
-      const response = await axios.put(`http://localhost:3000/interests/${interestId}`, {
-        status: action, // "accepted" ou "rejected"
-      });
+        await axios.put(`http://localhost:3000/interests/${interestId}`, { status: action });
 
-      setInterests((prevInterests) =>
-        prevInterests.map((interest) =>
-          interest.id === interestId ? { ...interest, status: action } : interest
-        )
-      );
+        // Enregistrer la notification
+        await axios.post("http://localhost:3000/notifications", {
+            user_id: interestedUserId,
+            type: `interest_${action}`,
+            message: `Votre demande pour "${title}" a été ${action === "accepted" ? "acceptée 🎉" : "refusée ❌"}.`,
+            related_entity_id: interestId,
+        });
 
-     // alert(response.data.message);
+        // Envoyer la notif en temps réel
+        socket.emit("send-notification", {
+            user_id: interestedUserId,
+            message: `Votre demande pour "${title}" a été ${action === "accepted" ? "acceptée 🎉" : "refusée ❌"}.`,
+        });
+
+        // Mettre à jour l’état des intérêts affichés
+        setInterests((prev) =>
+            prev.map((interest) =>
+                interest.id === interestId ? { ...interest, status: action } : interest
+            )
+        );
     } catch (error) {
-      console.error("Erreur lors de la mise à jour de l'intérêt :", error);
-      alert("Une erreur est survenue lors de la mise à jour de l'intérêt.");
+        console.error("Erreur lors de la mise à jour de l'intérêt :", error);
+        alert("Une erreur est survenue lors de la mise à jour de l'intérêt.");
     }
-  };
+};
 
   const fetchContact = async (interestId, userId) => {
     try {
@@ -83,22 +96,16 @@ function InterestsList() {
                 </p>
               </div>
               <div className="actions">
-                {interest.status === "pending" && (
-                  <>
-                    <button
-                      className="accept-btn"
-                      onClick={() => handleAction(interest.id, "accepted")}
-                    >
-                      Accepter
+              {interest.status === "pending" && (
+                <>
+                    <button className="accept-btn" onClick={() => handleAction(interest.id, "accepted", interest.interested_user_id, interest.proposition_title)}>
+                        ✅ Accepter
                     </button>
-                    <button
-                      className="reject-btn"
-                      onClick={() => handleAction(interest.id, "rejected")}
-                    >
-                      Refuser
+                    <button className="reject-btn" onClick={() => handleAction(interest.id, "rejected", interest.interested_user_id, interest.proposition_title)}>
+                        ❌ Refuser
                     </button>
-                  </>
-                )}
+                </>
+              )}
                 {interest.status === "accepted" && !interest.contact && (
                   <button
                     className="show-contact-btn"
