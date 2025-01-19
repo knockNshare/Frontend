@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import EventForm from '../components/EventForm';
+import EventDetails from '../components/EventDetails'; // Nouveau composant
 import DefaultImage from '../assets/default-eventpic.jpg';
 import axios from 'axios';
 
 const EventPage = () => {
     const [events, setEvents] = useState([]);
-    const [cities, setCities] = useState([]); // Liste des villes disponibles
-    const [selectedCityId, setSelectedCityId] = useState(''); // Ville sélectionnée pour filtrer
+    const [cities, setCities] = useState([]);
+    const [selectedCityId, setSelectedCityId] = useState('');
     const [showForm, setShowForm] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const userId = 1; // ID temporaire de l'utilisateur actuel
+    const userId = 1; // ID temporaire
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
@@ -21,11 +24,9 @@ const EventPage = () => {
         setLoading(true);
         setError(null);
         try {
-            // Récupérer tous les événements
             const eventsResponse = await axios.get('http://localhost:3000/api/events');
             setEvents(eventsResponse.data);
 
-            // Récupérer la liste des villes
             const citiesResponse = await axios.get('http://localhost:3000/cities');
             setCities(citiesResponse.data);
         } catch (error) {
@@ -33,6 +34,17 @@ const EventPage = () => {
             setError('Impossible de charger les données. Veuillez réessayer plus tard.');
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Charger les détails d'un événement
+    const fetchEventDetails = async (eventId) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/events/${eventId}`);
+            setSelectedEvent(response.data);
+            setShowDetails(true);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des détails de l\'événement :', error);
         }
     };
 
@@ -45,8 +57,10 @@ const EventPage = () => {
             });
             setEvents([...events, { ...newEvent, id: response.data.event_id }]);
             setShowForm(false);
+            alert('Événement créé avec succès !');
         } catch (error) {
             console.error('Erreur lors de la création de l\'événement :', error);
+            alert('Erreur lors de la création de l\'événement.');
         }
     };
 
@@ -54,7 +68,6 @@ const EventPage = () => {
         fetchData();
     }, []);
 
-    // Fonction pour filtrer les événements par catégorie, recherche et ville
     const filteredEvents = events.filter((event) => {
         const matchesSearch =
             event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,13 +83,39 @@ const EventPage = () => {
             <h1 className="text-2xl font-bold mb-4">Gestion des Événements</h1>
 
             <button
-                onClick={() => setShowForm(!showForm)}
+                onClick={() => setShowForm(true)}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4"
             >
                 + Créer un événement
             </button>
 
-            {showForm && <EventForm onSubmit={addEvent} userId={userId} />}
+            {showForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                        <button
+                            onClick={() => setShowForm(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                        >
+                            ✖
+                        </button>
+                        <EventForm onSubmit={addEvent} userId={userId} />
+                    </div>
+                </div>
+            )}
+
+            {showDetails && selectedEvent && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
+                        <button
+                            onClick={() => setShowDetails(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+                        >
+                            ✖
+                        </button>
+                        <EventDetails event={selectedEvent} />
+                    </div>
+                </div>
+            )}
 
             <div className="mb-4">
                 <input
@@ -87,7 +126,6 @@ const EventPage = () => {
                     className="border p-2 w-full rounded mb-2"
                 />
 
-                {/* Conteneur flex pour aligner les catégories et le menu déroulant */}
                 <div className="flex items-center justify-between">
                     <div className="flex flex-wrap gap-2">
                         {categories.map((category) => (
@@ -119,7 +157,7 @@ const EventPage = () => {
                             id="city-filter"
                             value={selectedCityId}
                             onChange={(e) => setSelectedCityId(e.target.value)}
-                            className="border p-2 rounded w-60" // Fixe la largeur du menu déroulant
+                            className="border p-2 rounded w-60"
                         >
                             <option value="">Toutes les villes</option>
                             {cities.map((city) => (
@@ -137,7 +175,11 @@ const EventPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredEvents.map((event) => (
-                    <div key={event.id} className="bg-white p-4 shadow rounded">
+                    <div
+                        key={event.id}
+                        className="bg-white p-4 shadow rounded cursor-pointer"
+                        onClick={() => fetchEventDetails(event.id)}
+                    >
                         <img
                             src={event.imageURL || DefaultImage}
                             alt={event.title}
@@ -152,19 +194,8 @@ const EventPage = () => {
                         <p className="text-sm text-gray-500 mb-2">
                             {`Date : ${new Date(event.date).toLocaleString()}`}
                         </p>
-                        <p className="text-sm text-gray-500 mb-2">
-                            {`Adresse : ${event.address}`}
-                        </p>
-                        {event.category && (
-                            <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm">
-                                {event.category}
-                            </span>
-                        )}
                     </div>
                 ))}
-                {!loading && !filteredEvents.length && !error && (
-                    <p className="text-gray-500 text-center col-span-3">Aucun événement trouvé.</p>
-                )}
             </div>
         </div>
     );

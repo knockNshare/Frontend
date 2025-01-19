@@ -9,20 +9,21 @@ const EventForm = ({ onSubmit, userId }) => {
         description: '',
         date: '',
         address: '',
-        city_id: '', // Nouveau champ pour city_id
-        category: categories[0], // Initialiser avec la première catégorie
+        city_id: '',
+        category: categories[0],
+        imageURL: '', // Champ pour l'URL de l'image
         creator_id: userId,
     });
 
-    const [cities, setCities] = useState([]); // Liste des villes récupérées
-    const [loadingCities, setLoadingCities] = useState(true); // Indique si les villes sont en cours de chargement
-    const [errorCities, setErrorCities] = useState(null); // Erreur lors du chargement des villes
+    const [cities, setCities] = useState([]);
+    const [loadingCities, setLoadingCities] = useState(true);
+    const [errorCities, setErrorCities] = useState(null);
+    const [errorImage, setErrorImage] = useState(null); // État pour les erreurs d'image
 
-    // Charger les villes depuis le backend
     const fetchCities = async () => {
         try {
             const response = await axios.get('http://localhost:3000/cities');
-            setCities(response.data); // Met à jour la liste des villes
+            setCities(response.data);
         } catch (error) {
             console.error("Erreur lors de la récupération des villes :", error);
             setErrorCities("Impossible de charger les villes. Veuillez réessayer.");
@@ -31,12 +32,34 @@ const EventForm = ({ onSubmit, userId }) => {
         }
     };
 
+    const validateImageURL = async () => {
+        if (!formData.imageURL) return true;
+
+        try {
+            const response = await axios.get('http://localhost:3000/api/validate-image', {
+                params: { url: formData.imageURL },
+            });
+            return response.data.valid;
+        } catch (error) {
+            console.error("Erreur lors de la validation de l'image :", error);
+            return false;
+        }
+    };
+
     useEffect(() => {
-        fetchCities(); // Charger les villes à l'ouverture du formulaire
+        fetchCities();
     }, []);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        const isImageValid = await validateImageURL();
+
+        if (!isImageValid) {
+            setErrorImage("Impossible de charger l'image. Une image par défaut sera utilisée.");
+            setFormData({ ...formData, imageURL: '' }); // Réinitialise l'URL si invalide
+            setTimeout(() => setErrorImage(null), 5000); // Efface le message après 5 secondes
+        }
+
         if (!formData.title || !formData.date || !formData.address || !formData.city_id) {
             alert("Veuillez remplir tous les champs obligatoires.");
             return;
@@ -49,16 +72,31 @@ const EventForm = ({ onSubmit, userId }) => {
         <form onSubmit={handleSubmit} className="bg-white p-4 shadow rounded mb-4">
             <h2 className="text-lg font-semibold mb-2">Créer un Nouvel Événement</h2>
 
-            {/* Titre */}
-            <div className="mb-4">
-                <label className="block font-semibold mb-1">Titre :</label>
-                <input
-                    type="text"
-                    placeholder="Titre de l'événement"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="border p-2 w-full rounded"
-                />
+            {/* Notification d'erreur d'image */}
+            {errorImage && <p className="text-red-500 text-center mb-4">{errorImage}</p>}
+
+            {/* Titre et URL de l'image */}
+            <div className="mb-4 flex items-center gap-4">
+                <div className="flex-1">
+                    <label className="block font-semibold mb-1">Titre :</label>
+                    <input
+                        type="text"
+                        placeholder="Titre de l'événement"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        className="border p-2 w-full rounded"
+                    />
+                </div>
+                <div className="flex-1">
+                    <label className="block font-semibold mb-1">URL de l'image :</label>
+                    <input
+                        type="text"
+                        placeholder="https://exemple.com/image.jpg"
+                        value={formData.imageURL}
+                        onChange={(e) => setFormData({ ...formData, imageURL: e.target.value })}
+                        className="border p-2 w-full rounded"
+                    />
+                </div>
             </div>
 
             {/* Description */}
@@ -95,7 +133,7 @@ const EventForm = ({ onSubmit, userId }) => {
                 />
             </div>
 
-            {/* Ville (city_id) */}
+            {/* Ville */}
             <div className="mb-4">
                 <label className="block font-semibold mb-1">Ville :</label>
                 {loadingCities ? (
