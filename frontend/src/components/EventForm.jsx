@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
-const EventForm = ({ onSubmit, userId }) => {
+const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -11,14 +11,13 @@ const EventForm = ({ onSubmit, userId }) => {
         address: '',
         city_id: '',
         category: categories[0],
-        imageURL: '', // Champ pour l'URL de l'image
-        creator_id: userId,
+        imageURL: '',
+        ...initialData,
     });
 
     const [cities, setCities] = useState([]);
     const [loadingCities, setLoadingCities] = useState(true);
     const [errorCities, setErrorCities] = useState(null);
-    const [errorImage, setErrorImage] = useState(null); // État pour les erreurs d'image
 
     const fetchCities = async () => {
         try {
@@ -32,85 +31,59 @@ const EventForm = ({ onSubmit, userId }) => {
         }
     };
 
-    const validateImageURL = async () => {
-        if (!formData.imageURL) return true;
-
-        try {
-            const response = await axios.get('http://localhost:3000/api/validate-image', {
-                params: { url: formData.imageURL },
-            });
-            return response.data.valid;
-        } catch (error) {
-            console.error("Erreur lors de la validation de l'image :", error);
-            return false;
-        }
-    };
-
     useEffect(() => {
         fetchCities();
     }, []);
 
+    useEffect(() => {
+        if (initialData.date) {
+            const date = new Date(initialData.date);
+            const localISOTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16); // Format datetime-local
+            setFormData((prev) => ({ ...prev, date: localISOTime }));
+        }
+    }, [initialData]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const isImageValid = await validateImageURL();
-
-        if (!isImageValid) {
-            setErrorImage("Impossible de charger l'image. Une image par défaut sera utilisée.");
-            setFormData({ ...formData, imageURL: '' }); // Réinitialise l'URL si invalide
-            setTimeout(() => setErrorImage(null), 5000); // Efface le message après 5 secondes
+        if (isEditing) {
+            try {
+                await axios.put(`http://localhost:3000/api/events/${initialData.id}`, formData);
+                onSubmit(formData);
+            } catch (error) {
+                console.error("Erreur lors de la mise à jour :", error);
+            }
+        } else {
+            onSubmit(formData);
         }
-
-        if (!formData.title || !formData.date || !formData.address || !formData.city_id) {
-            alert("Veuillez remplir tous les champs obligatoires.");
-            return;
-        }
-
-        onSubmit(formData);
     };
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 shadow rounded mb-4">
-            <h2 className="text-lg font-semibold mb-2">Créer un Nouvel Événement</h2>
+            <h2 className="text-lg font-semibold mb-2">
+                {isEditing ? 'Modifier l\'événement' : 'Créer un Nouvel Événement'}
+            </h2>
 
-            {/* Notification d'erreur d'image */}
-            {errorImage && <p className="text-red-500 text-center mb-4">{errorImage}</p>}
-
-            {/* Titre et URL de l'image */}
-            <div className="mb-4 flex items-center gap-4">
-                <div className="flex-1">
-                    <label className="block font-semibold mb-1">Titre :</label>
-                    <input
-                        type="text"
-                        placeholder="Titre de l'événement"
-                        value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="border p-2 w-full rounded"
-                    />
-                </div>
-                <div className="flex-1">
-                    <label className="block font-semibold mb-1">URL de l'image :</label>
-                    <input
-                        type="text"
-                        placeholder="https://exemple.com/image.jpg"
-                        value={formData.imageURL}
-                        onChange={(e) => setFormData({ ...formData, imageURL: e.target.value })}
-                        className="border p-2 w-full rounded"
-                    />
-                </div>
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">Titre :</label>
+                <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    className="border p-2 w-full rounded"
+                />
             </div>
 
-            {/* Description */}
             <div className="mb-4">
                 <label className="block font-semibold mb-1">Description :</label>
                 <textarea
-                    placeholder="Description de l'événement"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     className="border p-2 w-full rounded"
-                ></textarea>
+                />
             </div>
 
-            {/* Date */}
             <div className="mb-4">
                 <label className="block font-semibold mb-1">Date :</label>
                 <input
@@ -121,63 +94,47 @@ const EventForm = ({ onSubmit, userId }) => {
                 />
             </div>
 
-            {/* Adresse */}
             <div className="mb-4">
                 <label className="block font-semibold mb-1">Adresse :</label>
                 <input
                     type="text"
-                    placeholder="Adresse"
                     value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                     className="border p-2 w-full rounded"
                 />
             </div>
 
-            {/* Ville */}
             <div className="mb-4">
                 <label className="block font-semibold mb-1">Ville :</label>
-                {loadingCities ? (
-                    <p className="text-blue-500">Chargement des villes...</p>
-                ) : errorCities ? (
-                    <p className="text-red-500">{errorCities}</p>
-                ) : (
-                    <select
-                        value={formData.city_id}
-                        onChange={(e) => setFormData({ ...formData, city_id: e.target.value })}
-                        className="border p-2 w-full rounded"
-                    >
-                        <option value="">-- Sélectionner une ville --</option>
-                        {cities.map((city) => (
-                            <option key={city.id} value={city.id}>
-                                {city.name} ({city.id})
-                            </option>
-                        ))}
-                    </select>
-                )}
-            </div>
-
-            {/* Catégorie */}
-            <div className="mb-4">
-                <label className="block font-semibold mb-1">Catégorie :</label>
                 <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    value={formData.city_id}
+                    onChange={(e) => setFormData({ ...formData, city_id: e.target.value })}
                     className="border p-2 w-full rounded"
                 >
-                    {categories.map((category) => (
-                        <option key={category} value={category}>
-                            {category}
+                    <option value="">-- Sélectionner une ville --</option>
+                    {cities.map((city) => (
+                        <option key={city.id} value={city.id}>
+                            {city.name}
                         </option>
                     ))}
                 </select>
             </div>
 
-            {/* Bouton */}
+            <div className="mb-4">
+                <label className="block font-semibold mb-1">URL de l'image :</label>
+                <input
+                    type="text"
+                    value={formData.imageURL}
+                    onChange={(e) => setFormData({ ...formData, imageURL: e.target.value })}
+                    className="border p-2 w-full rounded"
+                />
+            </div>
+
             <button
                 type="submit"
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
             >
-                Créer l'événement
+                {isEditing ? 'Mettre à jour' : 'Créer l\'événement'}
             </button>
         </form>
     );

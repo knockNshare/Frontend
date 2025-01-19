@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import EventForm from '../components/EventForm';
-import EventDetails from '../components/EventDetails'; // Nouveau composant
+import EventDetails from '../components/EventDetails';
 import DefaultImage from '../assets/default-eventpic.jpg';
 import axios from 'axios';
 
@@ -15,11 +15,11 @@ const EventPage = () => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const userId = 1; // ID temporaire
+    const userId = 1;
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
-    // Charger les événements et les villes depuis le backend
+    // Fetch events and cities from the backend
     const fetchData = async () => {
         setLoading(true);
         setError(null);
@@ -37,18 +37,10 @@ const EventPage = () => {
         }
     };
 
-    // Charger les détails d'un événement
-    const fetchEventDetails = async (eventId) => {
-        try {
-            const response = await axios.get(`http://localhost:3000/api/events/${eventId}`);
-            setSelectedEvent(response.data);
-            setShowDetails(true);
-        } catch (error) {
-            console.error('Erreur lors de la récupération des détails de l\'événement :', error);
-        }
-    };
+    useEffect(() => {
+        fetchData();
+    }, []);
 
-    // Ajouter un événement
     const addEvent = async (newEvent) => {
         try {
             const response = await axios.post('http://localhost:3000/api/events', {
@@ -64,9 +56,25 @@ const EventPage = () => {
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    const updateEvent = (id, updatedEvent) => {
+        setEvents(events.map((event) => (event.id === id ? { ...event, ...updatedEvent } : event)));
+        setShowDetails(false);
+    };
+
+    const deleteEvent = (id) => {
+        setEvents(events.filter((event) => event.id !== id));
+        setShowDetails(false);
+    };
+
+    const fetchEventDetails = async (eventId) => {
+        try {
+            const response = await axios.get(`http://localhost:3000/api/events/${eventId}`);
+            setSelectedEvent(response.data);
+            setShowDetails(true);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des détails de l\'événement :', error);
+        }
+    };
 
     const filteredEvents = events.filter((event) => {
         const matchesSearch =
@@ -106,13 +114,12 @@ const EventPage = () => {
             {showDetails && selectedEvent && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="relative bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-                        <button
-                            onClick={() => setShowDetails(false)}
-                            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-                        >
-                            ✖
-                        </button>
-                        <EventDetails event={selectedEvent} />
+                        <EventDetails
+                            event={selectedEvent}
+                            onDelete={deleteEvent}
+                            onUpdate={updateEvent}
+                            setShowDetails={setShowDetails}
+                        />
                     </div>
                 </div>
             )}
