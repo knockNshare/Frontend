@@ -121,6 +121,21 @@ const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
             </div>
 
             <div className="mb-4">
+                <label className="block font-semibold mb-1">Catégorie :</label>
+                <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="border p-2 w-full rounded"
+                >
+                    {categories.map((category) => (
+                        <option key={category} value={category}>
+                            {category}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="mb-4">
                 <label className="block font-semibold mb-1">URL de l'image :</label>
                 <input
                     type="text"
