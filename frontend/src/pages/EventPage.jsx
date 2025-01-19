@@ -37,9 +37,29 @@ const EventPage = () => {
         }
     };
 
+    const fetchFilteredEvents = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/api/events/search', {
+                params: {
+                    keyword: searchTerm,
+                    categories: selectedCategories.join(','), // Join selected categories to send in the request
+                    cityId: selectedCityId,
+                },
+            });
+            setEvents(response.data); // Update events with filtered results
+        } catch (error) {
+            console.error('Erreur lors de la recherche des événements :', error);
+            setError('Impossible de charger les événements filtrés.');
+        }
+    };
+
     useEffect(() => {
         fetchData();
     }, []);
+
+    useEffect(() => {
+        fetchFilteredEvents();
+    }, [searchTerm, selectedCategories, selectedCityId]); // Fetch filtered events whenever filters change
 
     const addEvent = async (newEvent) => {
         try {
@@ -75,16 +95,6 @@ const EventPage = () => {
             console.error('Erreur lors de la récupération des détails de l\'événement :', error);
         }
     };
-
-    const filteredEvents = events.filter((event) => {
-        const matchesSearch =
-            event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            event.description.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory =
-            selectedCategories.length === 0 || selectedCategories.some((cat) => event.category.includes(cat));
-        const matchesCity = !selectedCityId || String(event.city_id) === String(selectedCityId);
-        return matchesSearch && matchesCategory && matchesCity;
-    });
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
@@ -145,11 +155,7 @@ const EventPage = () => {
                                             : [...prev, category]
                                     )
                                 }
-                                className={`px-4 py-2 rounded ${
-                                    selectedCategories.includes(category)
-                                        ? 'bg-blue-500 text-white'
-                                        : 'bg-gray-200 text-gray-700'
-                                }`}
+                                className={`px-4 py-2 rounded ${selectedCategories.includes(category) ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'}`}
                             >
                                 {category}
                             </button>
@@ -181,7 +187,7 @@ const EventPage = () => {
             {error && <p className="text-red-500">{error}</p>}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {filteredEvents.map((event) => (
+                {events.map((event) => (
                     <div
                         key={event.id}
                         className="bg-white p-4 shadow rounded cursor-pointer"
