@@ -1,16 +1,15 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth} from '../context/AuthContext';
 import Notifications from './Notifications';
 import '../styles/Navbar.css';
 
 const Navbar = () => {
-  const { userId } = useAuth();
-  const navigate = useNavigate();
+  const { userId, logout } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("userId"); // Supprimer l'ID utilisateur
-    navigate('/');
+    logout();  // Calls the logout function from AuthContext
+    
   };
 
   return (
