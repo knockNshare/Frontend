@@ -8,6 +8,7 @@ const SearchFeature = () => {
   const [error, setError] = useState(null);
   const [userId, setUserId] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [searchedKeywords, setSearchedKeywords] = useState("");
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
@@ -27,12 +28,16 @@ const SearchFeature = () => {
       return;
     }
 
-    console.log("🔍 Recherche envoyée avec user_id:", userId, "et catégorie:", selectedCategory);
+    console.log("🔍 Recherche envoyée avec user_id:", userId, ", catégorie:", selectedCategory, ", mot-clé:", searchedKeywords);
 
     try {
         const response = await axios.get("http://localhost:3000/api/propositions/search", {
-            params: { service_type: selectedCategory, user_id: userId },
-        });
+          params: { 
+            service_type: selectedCategory, 
+            user_id: userId, 
+            keyword: searchedKeywords // Include input value in the query
+          },
+          });
         console.log("🔍 Données reçues du backend :", response.data);
         setResults(response.data);
     } catch (error) {
@@ -42,7 +47,13 @@ const SearchFeature = () => {
 
   return (
     <div>
-      <SearchBar selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} onSearch={handleSearch} />
+    <SearchBar 
+      selectedCategory={selectedCategory} 
+      setSelectedCategory={setSelectedCategory} 
+      searchedKeywords={searchedKeywords}
+      setSearchedKeywords={setSearchedKeywords}
+      onSearch={handleSearch} 
+    />
       {error && <p className="error-message">{error}</p>}
       <ResultsList results={results} />
     </div>

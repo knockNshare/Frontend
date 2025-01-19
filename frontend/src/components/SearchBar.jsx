@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "../styles/SearchBar.css";
-
-const SearchBar = ({ selectedCategory, setSelectedCategory, onSearch }) => {
-  const [inputValue, setInputValue] = useState('');
+const SearchBar = ({ 
+  selectedCategory, 
+  setSelectedCategory, 
+  searchedKeywords, 
+  setSearchedKeywords, 
+  onSearch 
+}) => {
   const [categories, setCategories] = useState([]);
 
-  // Récupère les catégories depuis l'API au chargement
+  // Fetch categories from API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -21,27 +25,16 @@ const SearchBar = ({ selectedCategory, setSelectedCategory, onSearch }) => {
   }, []);
 
   const handleInputChange = (e) => {
-    setInputValue(e.target.value);
+    setSearchedKeywords(e.target.value); // Update the parent state with the input value
   };
 
   const handleCategoryChange = (e) => {
-    setSelectedCategory(e.target.value); // Met à jour la catégorie via `setSelectedCategory`
+    setSelectedCategory(e.target.value); // Update the parent state with the selected category
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Vérifie que les champs ne sont pas vides
-    if (!inputValue.trim()) {
-      alert("❌ Veuillez entrer un mot-clé dans la barre de recherche.");
-      return;
-    }
-    if (!selectedCategory) {
-      alert("❌ Veuillez sélectionner une catégorie.");
-      return;
-    }
-
-    onSearch(); // Déclenche la recherche
+    onSearch(); // Trigger search in parent
   };
 
   return (
@@ -50,14 +43,14 @@ const SearchBar = ({ selectedCategory, setSelectedCategory, onSearch }) => {
         type="text"
         className="search-bar-input"
         placeholder="Rechercher un objet ou service..."
-        value={inputValue}
-        onChange={handleInputChange}
+        value={searchedKeywords} // Bind to parent state
+        onChange={handleInputChange} // Update parent state on input change
       />
       
       <select
         className="search-bar-select"
-        value={selectedCategory}
-        onChange={handleCategoryChange}
+        value={selectedCategory} // Bind to parent state
+        onChange={handleCategoryChange} // Update parent state on selection change
       >
         <option value="" disabled>Choisir une catégorie</option>
         {categories.map((cat) => (
@@ -71,5 +64,4 @@ const SearchBar = ({ selectedCategory, setSelectedCategory, onSearch }) => {
     </form>
   );
 };
-
-export default SearchBar;
+export default SearchBar ;
