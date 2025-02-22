@@ -1,0 +1,152 @@
+/* Styles généraux */
+.signalements-page {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Titres principaux */
+.signalements-page h1 {
+    font-size: 26px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Sous-titres (ex: 📍 Faire un signalement) */
+.signalements-section h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ddd;
+}
+
+/* Conteneur général des sections */
+.signalements-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Boutons de catégorie */
+.categories-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.categorie-btn {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.3s;
+    background: #e8eaf6;
+    color: #333;
+}
+
+.categorie-btn:hover, .categorie-btn.selected {
+    background: #3f51b5;
+    color: white;
+}
+
+/* Champ de description */
+textarea {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Champ du quartier */
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Case à cocher Critique */
+.critique-checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.critique-checkbox-container input {
+    transform: scale(1.2);
+}
+
+/* criminel qui avait fait n'importe quoi sur dashboard!!!!!
+button[type="submit"] {
+    width: 100%;
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button[type="submit"]:hover {
+    background: #0056b3;
+} */
+
+/* Liste des signalements */
+.signalement-list {
+    list-style: none;
+    padding: 0;
+}
+
+.signalement-item {
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.signalement-header {
+    font-weight: bold;
+    padding: 8px;
+    border-radius: 5px;
+    color: white;
+    margin-bottom: 5px;
+}
+
+/* ✅ Style pour les signalements résolus */
+.signalement-item.resolved {
+    background: #f3f3f3;
+    color: #888;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+/* ✅ Badge pour signalement terminé */
+.resolved-badge {
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 10px;
+    display: block;
+    text-align: center;
+}
+
+/* Style par catégorie */
+.Dangers { background: #dc3545; }
+.Urbain { background: #ffc107; }
+.Bruit { background: #17a2b8; }
+.Stationnement { background: #28a745; }

@@ -11,6 +11,7 @@ import UserProfile from './pages/UserProfile';
 import EventPage from './pages/EventPage';
 import Navbar from './components/Navbar';
 import ProjectsPage from "./pages/ProjectsPage";
+import SignalementsPage from './pages/SignalementsPage';
 
 const App = () => {
   const { userId } = useAuth();
@@ -61,6 +62,7 @@ const App = () => {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/events" element={<EventPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/signalement" element={<SignalementsPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </>
         )}

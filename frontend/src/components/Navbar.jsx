@@ -19,6 +19,7 @@ const Navbar = () => {
         <Link to="/profile" className="nav-link">👤 Profil</Link>
         <Link to="/events" className="nav-link">📅 Événements</Link>
         <Link to="/projects" className="nav-link">🎯 Projets</Link>
+        <Link to="/signalement">⚠️ Signaler un problème dans le quartier</Link>
       </div>
 
       {userId && (

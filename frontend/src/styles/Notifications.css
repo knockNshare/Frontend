@@ -100,21 +100,17 @@
 
 /* 👀 Bouton "Voir la demande" */
 .view-request-btn {
-    background: #007bff;
+    background: #8b8996;
     color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
     font-weight: bold;
-    flex-grow: 1;
-    text-align: center;
+    transition: 0.3s;
 }
 
 .view-request-btn:hover {
-    background: #0056b3;
+    background: #5c5a62;
 }
 
 /* ❌ Bouton pour supprimer une notif */
@@ -171,6 +167,32 @@
 }
 .clear-all-btn:hover {
     background: darkred;
+}
+
+/* notifs de danger */
+/* 🔴 Alertes critiques */
+.notif-danger {
+    background: #ffebee; /* Rouge clair */
+    border-left: 4px solid #d32f2f; /* Rouge foncé */
+    color: #b71c1c;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* ⚠️ Bouton "Voir les signalements" */
+.view-request-btn-danger {
+    background: #d32f2f;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.view-request-btn-danger:hover {
+    background: #b71c1c;
 }
 
 /* 💡 Animation d’apparition des notifs */
