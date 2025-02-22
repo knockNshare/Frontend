@@ -1,0 +1,62 @@
+@startuml
+participant "Utilisateur Intéressé (par l'annonce)" as UI
+participant "Frontend (React)" as FE
+participant "Backend API" as API
+participant "Base de Données" as DB
+participant "WebSockets" as WS
+participant "Proposeur (de l'annonce)" as P
+
+== 📩 1. L'utilisateur envoie une demande d’intérêt ==
+UI -> FE: Clique sur "Demander"
+FE -> API: **POST** /interests (proposition_id, interested_user_id)
+API -> DB: 🔍 Vérifie que la proposition existe
+DB --> API: ✅ OK
+API -> DB: 📝 Enregistre la demande avec statut **"pending"**
+DB --> API: ✅ OK (id_interet)
+API -> WS: 📡 **Émet une notification au proposeur**
+WS --> P: 🔔 "Nouvelle demande reçue"
+
+== 📥 2. Le proposeur consulte ses demandes ==
+P -> FE: Accède à "Mes Intérêts Reçus"
+FE -> API: **GET** /interests/received/:userId
+API -> DB: 🔍 Récupère toutes les demandes associées à l’utilisateur
+DB --> API: 📋 Renvoie les demandes (id, titre, utilisateur intéressé)
+API --> FE: 🖥️ Affiche la liste des demandes
+
+== ✅ 3A. Le proposeur **accepte** la demande ==
+P -> FE: Clique sur "**Accepter**"
+FE -> API: **PUT** /interests/:id (status: accepted)
+API -> DB: ✅ Met à jour le statut en **"accepted"**
+DB --> API: ✅ OK
+
+== **Notification & accès aux contacts** ==
+API -> DB: 🔍 Récupère le user_id de l’utilisateur intéressé
+DB --> API: ✅ OK (user_id)
+API -> DB: 📞 Récupère les coordonnées du proposeur (email & téléphone)
+DB --> API: 📋 OK
+API -> WS: 📡 **Émet une notification avec le statut accepté**
+WS --> UI: 🔔 "**🎉 Votre demande a été acceptée ! Voici les contacts 📧📞**"
+UI -> FE: 📥 Accède à "Mes Demandes Envoyées"
+FE -> API: **GET** /interests/sent/:userId
+API -> DB: 🔍 Récupère les demandes mises à jour
+DB --> API: 📋 Renvoie les demandes avec statut mis à jour
+API --> FE: 🖥️ Affiche la demande comme "Acceptée" ✅
+
+== ❌ 3B. Le proposeur **refuse** la demande ==
+P -> FE: Clique sur "**Refuser**"
+FE -> API: **PUT** /interests/:id (status: rejected)
+API -> DB: ❌ Met à jour le statut en **"rejected"**
+DB --> API: ✅ OK
+
+==️ **Notification de refus** ==
+API -> DB: 🔍 Récupère le user_id de l’utilisateur intéressé
+DB --> API: ✅ OK (user_id)
+API -> WS: 📡 **Émet une notification avec le statut refusé**
+WS --> UI: 🔔 "**❌ Votre demande a été refusée.**"
+UI -> FE: 📥 Accède à "Mes Demandes Envoyées"
+FE -> API: **GET** /interests/sent/:userId
+API -> DB: 🔍 Récupère les demandes mises à jour
+DB --> API: 📋 Renvoie les demandes avec statut mis à jour
+API --> FE: 🖥️ Affiche la demande comme "Refusée" ❌
+
+@enduml

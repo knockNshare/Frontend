@@ -1,0 +1,22 @@
+@startuml
+participant "Utilisateur Intéressé (par l'annonce)" as UI
+participant "Backend API" as API
+participant "Proposeur (de l'annonce)" as P
+participant "Base de Données" as DB
+participant "WebSockets" as WS
+
+UI -> API: POST /interests (demande d’intérêt)
+API -> DB: Enregistre la demande
+DB --> API: OK (id_interet)
+API -> WS: Émet une notif au proposeur
+WS --> P: 🔔 "Nouvelle demande reçue"
+P -> API: GET /interests/received
+API -> DB: Récupère les demandes
+DB --> API: Renvoie la liste
+API --> P: Affiche les demandes
+P -> API: PUT /interests/:id (accept/refuse)
+API -> DB: Met à jour le statut
+DB --> API: OK
+API -> WS: Émet une notif à l’utilisateur intéressé
+WS --> UI: 🔔 "Votre demande a été acceptée/refusée"
+@enduml
