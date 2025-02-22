@@ -22,7 +22,8 @@ const ProjectList = () => {
         <p>Aucun projet disponible.</p>
       ) : (
         projects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+          <ProjectCard key={project.id} project={project} userId={localStorage.getItem("userId")} />
+
         ))
       )}
     </div>

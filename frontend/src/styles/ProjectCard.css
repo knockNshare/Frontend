@@ -1,43 +1,78 @@
 .project-card {
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 5px;
-  background: #fff;
+  width: 100%;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.project-card .header {
+
+.project-card:hover {
+  transform: translateY(-3px);
+}
+
+.project-header {
   display: flex;
   justify-content: space-between;
+  font-size: 13px;
+  color: gray;
+  margin-bottom: 8px;
 }
 
-.project-card .title {
-  cursor: pointer;
+.category {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.project-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.project-description {
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.project-author {
+  font-size: 14px;
   color: #333;
 }
 
-.project-card .description {
-  color: #666;
-}
-
-.project-card .footer {
+.vote-section {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end; 
+  gap: 10px;
   align-items: center;
+  margin-top: 10px;
 }
 
-.vote-buttons button {
-  margin-left: 5px;
-  padding: 5px 10px;
+
+.vote-button {
+  background: #f8f9fa;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
   cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
-.upvote {
-  background-color: lightgreen;
-  border: none;
+.vote-button:hover {
+  background: #007bff;
+  color: white;
 }
 
-.downvote {
-  background-color: lightcoral;
-  border: none;
+.vote-button.active {
+  background: #ffc107;
+  color: white;
+}
+
+.vote-count {
+  font-size: 15px;
+  font-weight: bold;
 }
