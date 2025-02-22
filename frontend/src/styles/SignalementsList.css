@@ -1,0 +1,51 @@
+.signalements-container {
+    padding: 20px;
+}
+
+.signalement-list {
+    list-style: none;
+    padding: 0;
+}
+
+.signalement-item {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.signalement-header {
+    padding: 10px;
+    font-weight: bold;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.signalement-body {
+    padding: 15px;
+}
+
+.signalement-quartier {
+    display: block;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.voir-plus-btn {
+    display: block;
+    text-align: center;
+    background: gray;;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.voir-plus-btn:hover {
+    background: #0056b3;
+}
