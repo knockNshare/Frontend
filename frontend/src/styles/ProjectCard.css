@@ -1,0 +1,43 @@
+.project-card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.project-card .header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.project-card .title {
+  cursor: pointer;
+  color: #333;
+}
+
+.project-card .description {
+  color: #666;
+}
+
+.project-card .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vote-buttons button {
+  margin-left: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.upvote {
+  background-color: lightgreen;
+  border: none;
+}
+
+.downvote {
+  background-color: lightcoral;
+  border: none;
+}

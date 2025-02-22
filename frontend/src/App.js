@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
 import EventPage from './pages/EventPage';
 import Navbar from './components/Navbar';
+import ProjectsPage from "./pages/ProjectsPage";
 
 const App = () => {
   const { userId } = useAuth();
@@ -59,6 +60,7 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/events" element={<EventPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </>
         )}

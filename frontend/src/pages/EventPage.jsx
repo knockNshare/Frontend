@@ -3,6 +3,7 @@ import EventForm from '../components/EventForm';
 import EventDetails from '../components/EventDetails';
 import DefaultImage from '../assets/default-eventpic.jpg';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const EventPage = () => {
     const [events, setEvents] = useState([]);
@@ -15,7 +16,7 @@ const EventPage = () => {
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const userId = 1;
+    const { userId } = useAuth();
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 

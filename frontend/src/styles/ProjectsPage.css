@@ -1,0 +1,28 @@
+.projects-page {
+  padding: 20px;
+}
+
+.projects-page h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.projects-page .header {
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px 20px;
+}
+
+.create-button {
+  background: #28a745;
+  color: white;
+  margin-top: 35px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.create-button:hover {
+  background: #218838;
+}

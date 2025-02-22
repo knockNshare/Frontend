@@ -18,6 +18,7 @@ const Navbar = () => {
         <Link to="/dashboard" className="nav-link">🏠 Dashboard</Link>
         <Link to="/profile" className="nav-link">👤 Profil</Link>
         <Link to="/events" className="nav-link">📅 Événements</Link>
+        <Link to="/projects" className="nav-link">🎯 Projets</Link>
       </div>
 
       {userId && (
