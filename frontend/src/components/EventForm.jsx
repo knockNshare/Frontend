@@ -108,7 +108,7 @@ const EventForm = ({ onSubmit, initialData = {}, isEditing = false,cityId }) => 
             <div className="mb-4">
                 <label className="block font-semibold mb-1">Quartier :</label>
                 <select
-                    value={formData.city_id}
+                    value={formData.quartierId}
                     onChange={(e) => setFormData({ ...formData, quartierId: e.target.value })}
                     className="border p-2 w-full rounded"
                 >
