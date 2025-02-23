@@ -74,7 +74,7 @@
 
 .signalement-item {
   background: #f8f9fa;
-  border-left: 5px solid red;
+  border-left: 5px solid rgb(163, 161, 161);
   padding: 10px;
   margin: 5px 0;
   border-radius: 5px;

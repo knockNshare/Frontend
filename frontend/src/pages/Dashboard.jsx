@@ -5,17 +5,35 @@ import SearchFeature from "../components/SearchFeature";
 import SignalementsList from "../components/SignalementsList";
 
 function Dashboard() {
-    const [signalements, setSignalements] = useState([]);
+  const [signalements, setSignalements] = useState([]);
 
-    useEffect(() => {
-        axios.get("http://localhost:3000/signalements")
-            .then((response) => {
-                setSignalements(response.data.signalements); 
-            })
-            .catch((error) => {
-                console.error("Erreur récupération signalements :", error);
-            });
-    }, []);
+  useEffect(() => {
+      // 📌 Charger les signalements initiaux
+      axios.get("http://localhost:3000/signalements")
+          .then((response) => {
+              setSignalements(response.data.signalements);
+          })
+          .catch((error) => {
+              console.error("Erreur récupération signalements :", error);
+          });
+
+      // 🔥 Connexion WebSocket pour mise à jour en direct
+      if (window.socket) {
+        // Le dashboard écoute les nouveaux signalements avec windows.socket.on
+          window.socket.on("new-signalement", (newSignalement) => {
+              console.log("🆕 Nouveau signalement reçu :", newSignalement);
+
+              // 🏷 Ajouter en tête de liste
+              setSignalements((prevSignalements) => [newSignalement, ...prevSignalements.slice(0, 4)]); 
+          });
+      }
+
+      return () => {
+          if (window.socket) {
+              window.socket.off("new-signalement"); // 🛑 Stopper l'écoute quand on quitte la page
+          }
+      };
+  }, []);
 
     return (
         <div className="dashboard">
