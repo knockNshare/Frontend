@@ -7,6 +7,7 @@ import categoryStyles from "./categoryStyles";
 // Utilisé dans Dashboard pour afficher les 5 derniers signalements et dans SignalementsPage pour voir tous les signalements.
 
 const SignalementsList = ({ signalements, limit, showAllLink, handleResoudre, isMesSignalements }) => {
+    //avant websockets
     return (
         <div className="signalements-container">
             {signalements.length === 0 ? (
