@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import { Link, useNavigate } from 'react-router-dom';
@@ -11,42 +11,44 @@ const SignupPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [cityId, setCityId] = useState('');
+  const [quartiers, setQuartiers] = useState([]);  
+  const [selectedQuartier, setSelectedQuartier] = useState(''); 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
-  // regex pour la force du mot de passe
-  const passwordConditions = [
-    { regex: /.{8,}/, message: "Au moins 8 caractères" },
-    { regex: /[a-z]/, message: "Une lettre minuscule" },
-    { regex: /[A-Z]/, message: "Une lettre majuscule" },
-    { regex: /\d/, message: "Un chiffre" },
-    { regex: /[@$!%*?&]/, message: "Un caractère spécial (@$!%*?&)" },
-  ];
+  useEffect(() => {
+    if (cityId) {
+      fetchQuartiers(cityId);
+    }
+  }, [cityId]);
 
-  const isConditionMet = (regex) => regex.test(password);
-
-  const allConditionsMet = confirmPassword && passwordConditions.every((condition) =>
-    isConditionMet(condition.regex)
-  );
+  const fetchQuartiers = async (cityId) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/quartiers/${cityId}`);
+      setQuartiers(response.data);
+    } catch (error) {
+      console.error("Error fetching quartiers:", error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage('');
-  
-    if (!name || !email || !phoneNumber || !password || !confirmPassword || !cityId) {
+
+    if (!name || !email || !phoneNumber || !password || !confirmPassword || !cityId || !selectedQuartier) {
       setErrorMessage("Tous les champs doivent être remplis.");
       setIsLoading(false);
       return;
     }
-  
+
     if (password !== confirmPassword) {
       setErrorMessage("Les mots de passe ne correspondent pas.");
       setIsLoading(false);
       return;
     }
-  
+
     try {
       const response = await axios.post('http://localhost:3000/api/signup', {
         name,
@@ -54,8 +56,9 @@ const SignupPage = () => {
         phone_number: phoneNumber,
         password,
         city_id: cityId,
+        quartier_id: selectedQuartier, // Only one quartier selected
       });
-  
+
       if (response.status === 201) {
         alert("Inscription réussie !");
         navigate('/dashboard');
@@ -70,6 +73,7 @@ const SignupPage = () => {
       setIsLoading(false);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
@@ -86,7 +90,6 @@ const SignupPage = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          
           <InputField
             id="signup-email"
             name="email"
@@ -97,21 +100,44 @@ const SignupPage = () => {
             autoComplete="email"
           />
           <InputField
-              id="signup-city-id"
-              name="city-id"
-              type="text"
-              placeholder="Code postal"
-              value={cityId}
-              onChange={(e) => setCityId(e.target.value)}
-            />
+            id="signup-city-id"
+            name="city-id"
+            type="text"
+            placeholder="Code postal"
+            value={cityId}
+            onChange={(e) => setCityId(e.target.value)}
+          />
+
+          {/* Quartier Selection Dropdown */}
+          <div className="mb-4">
+          <select
+            id="quartier-select"
+            value={selectedQuartier}
+            onChange={(e) => setSelectedQuartier(e.target.value)}
+            className={`w-full p-4 border rounded-md bg-white 
+                        ${selectedQuartier ? "text-black" : "text-gray-400"}`}
+          >
+            <option value="" disabled>
+              Quartier
+            </option>
+            {quartiers.map((quartier) => (
+              <option key={quartier.id} value={quartier.id}>
+                {quartier.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+
           <InputField
-              id="signup-phone-number"
-              name="phone-number"
-              type="text"
-              placeholder="Numéro de téléphone"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
+            id="signup-phone-number"
+            name="phone-number"
+            type="text"
+            placeholder="Numéro de téléphone"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
+        
           <InputField
             id="signup-password"
             name="password"
@@ -121,19 +147,6 @@ const SignupPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
           />
-          {/* Affichage des conditions de force */}
-          <ul className="text-sm mb-4">
-            {passwordConditions.map((condition, index) => (
-              <li
-                key={index}
-                className={`${
-                  isConditionMet(condition.regex) ? "text-green-500" : "text-gray-700"
-                }`}
-              >
-                {condition.message}
-              </li>
-            ))}
-          </ul>
           <InputField
             id="signup-confirm-password"
             name="confirm-password"
@@ -146,7 +159,7 @@ const SignupPage = () => {
           <Button
             type="submit"
             text={isLoading ? "Inscription..." : "S'inscrire"}
-            disabled={isLoading || !allConditionsMet}
+            disabled={isLoading || !selectedQuartier}
             className="w-full"
           />
         </form>
