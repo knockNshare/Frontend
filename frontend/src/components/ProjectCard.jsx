@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import "../styles/ProjectCard.css";
 
@@ -52,7 +53,9 @@ const ProjectCard = ({ project, userId }) => {
         <span className="date">{new Date(project.created_at).toLocaleDateString()}</span>
       </div>
 
-      <h3 className="project-title">{project.title}</h3>
+      <h3 className="project-title">
+        <Link to={`/projects/${project.id}`}>{project.title}</Link>
+      </h3>
       <p className="project-description">
         {project.description.length > 80
           ? project.description.substring(0, 80) + "..."

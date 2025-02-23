@@ -10,7 +10,9 @@ import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
 import EventPage from './pages/EventPage';
 import Navbar from './components/Navbar';
-import ProjectsPage from "./pages/ProjectsPage";
+import ProjectsPage from './pages/ProjectsPage';
+import ProjectDetails from './pages/ProjectDetails';
+import EditProject from "./pages/EditProject";
 
 const App = () => {
   const { userId } = useAuth();
@@ -61,6 +63,8 @@ const App = () => {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/events" element={<EventPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:id" element={<ProjectDetails />} />
+            <Route path="/projects/:id/edit" element={<EditProject />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </>
         )}

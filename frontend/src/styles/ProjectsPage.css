@@ -1,6 +1,9 @@
 .projects-page {
-  padding: 20px;
+  padding: 1.5rem; 
+  background-color: #f3f4f6; 
+  min-height: 100vh; 
 }
+
 
 .projects-page h2 {
   text-align: center;

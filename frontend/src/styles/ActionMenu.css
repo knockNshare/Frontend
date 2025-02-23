@@ -1,0 +1,39 @@
+.action-menu-container {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+}
+
+.action-menu-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.action-menu-dropdown {
+  width: 114px;
+  position: absolute;
+  right: 0;
+  background: white;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.action-menu-item {
+  display: block;
+  padding: 8px;
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.action-menu-item:hover {
+  background: #f0f0f0;
+}
+
+.action-menu-item.delete {
+  color: red;
+}
