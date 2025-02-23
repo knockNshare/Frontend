@@ -7,16 +7,16 @@ import { useAuth } from '../context/AuthContext';
 
 const EventPage = () => {
     const [events, setEvents] = useState([]);
-    const [cities, setCities] = useState([]);
-    const [selectedCityId, setSelectedCityId] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [showDetails, setShowDetails] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [cityId, setCityId] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { userId } = useAuth();
+    
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
@@ -25,11 +25,20 @@ const EventPage = () => {
         setLoading(true);
         setError(null);
         try {
-            const eventsResponse = await axios.get('http://localhost:3000/api/events');
+            console.log("user id", userId);
+    
+            // Fetch user city ID
+            const cityResponse = await axios.get(`http://localhost:3000/users/city/${userId}`);
+            const userCityId = cityResponse.data.data.city_id; // Correct way to access city_id
+            setCityId(userCityId);
+            console.log("userCityId is",userCityId);
+            // Update state with city ID
+    
+            // Fetch events related to the city
+            const eventsResponse = await axios.get(`http://localhost:3000/api/events/region/${userCityId}`);
+            console.log("events",eventsResponse);
             setEvents(eventsResponse.data);
 
-            const citiesResponse = await axios.get('http://localhost:3000/cities');
-            setCities(citiesResponse.data);
         } catch (error) {
             console.error('Erreur lors de la récupération des données :', error);
             setError('Impossible de charger les données. Veuillez réessayer plus tard.');
@@ -37,14 +46,14 @@ const EventPage = () => {
             setLoading(false);
         }
     };
-
+    
     const fetchFilteredEvents = async () => {
         try {
             const response = await axios.get('http://localhost:3000/api/events/search', {
                 params: {
                     keyword: searchTerm,
                     categories: selectedCategories.join(','), // Join selected categories to send in the request
-                    cityId: selectedCityId,
+                    cityId : cityId
                 },
             });
             setEvents(response.data); // Update events with filtered results
@@ -57,10 +66,9 @@ const EventPage = () => {
     useEffect(() => {
         fetchData();
     }, []);
-
     useEffect(() => {
         fetchFilteredEvents();
-    }, [searchTerm, selectedCategories, selectedCityId]); // Fetch filtered events whenever filters change
+    }, [searchTerm, selectedCategories]); // Fetch filtered events whenever filters change
 
     const addEvent = async (newEvent) => {
         try {
@@ -117,7 +125,7 @@ const EventPage = () => {
                         >
                             ✖
                         </button>
-                        <EventForm onSubmit={addEvent} userId={userId} />
+                        <EventForm onSubmit={addEvent} userId={userId} cityId={cityId}/>
                     </div>
                 </div>
             )}
@@ -162,55 +170,40 @@ const EventPage = () => {
                             </button>
                         ))}
                     </div>
-
-                    <div className="ml-4">
-                        <label htmlFor="city-filter" className="block mb-1 font-bold">
-                            Filtrer par ville :
-                        </label>
-                        <select
-                            id="city-filter"
-                            value={selectedCityId}
-                            onChange={(e) => setSelectedCityId(e.target.value)}
-                            className="border p-2 rounded w-60"
-                        >
-                            <option value="">Toutes les villes</option>
-                            {cities.map((city) => (
-                                <option key={city.id} value={city.id}>
-                                    {city.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
                 </div>
             </div>
 
-            {loading && <p>Chargement des événements...</p>}
-            {error && <p className="text-red-500">{error}</p>}
-
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {events.map((event) => (
-                    <div
-                        key={event.id}
-                        className="bg-white p-4 shadow rounded cursor-pointer"
-                        onClick={() => fetchEventDetails(event.id)}
-                    >
-                        <img
-                            src={event.imageURL || DefaultImage}
-                            alt={event.title}
-                            className="w-full h-40 object-cover mb-2 rounded"
-                        />
-                        <h3 className="text-lg font-bold mb-2">{event.title}</h3>
-                        <p className="text-gray-700 mb-2">
-                            {event.description.length > 100
-                                ? `${event.description.slice(0, 100)}...`
-                                : event.description}
-                        </p>
-                        <p className="text-sm text-gray-500 mb-2">
-                            {`Date : ${new Date(event.date).toLocaleString()}`}
-                        </p>
-                    </div>
-                ))}
+    {loading ? (
+        <p>Chargement des événements...</p>
+    ) : events.length === 0 ? (
+        <p>Il n'y a pas encore des événements dans votre ville.</p>
+    ) : (
+        events.map((event) => (
+            <div
+                key={event.id}
+                className="bg-white p-4 shadow rounded cursor-pointer"
+                onClick={() => fetchEventDetails(event.id)}
+            >
+                <img
+                    src={event.imageURL || DefaultImage}
+                    alt={event.title}
+                    className="w-full h-40 object-cover mb-2 rounded"
+                />
+                <h3 className="text-lg font-bold mb-2">{event.title}</h3>
+                <p className="text-gray-700 mb-2">
+                    {event.description.length > 100
+                        ? `${event.description.slice(0, 100)}...`
+                        : event.description}
+                </p>
+                <p className="text-sm text-gray-500 mb-2">
+                    {`Date : ${new Date(event.date).toLocaleString()}`}
+                </p>
             </div>
+        ))
+    )}
+</div>
+
         </div>
     );
 };

@@ -3,26 +3,27 @@ import axios from 'axios';
 
 const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
 
-const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
+const EventForm = ({ onSubmit, initialData = {}, isEditing = false,cityId }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         date: '',
         address: '',
-        city_id: '',
+        city_id :cityId,
+        quartierId: '',
         category: categories[0],
         imageURL: '',
         ...initialData,
     });
 
-    const [cities, setCities] = useState([]);
+    const [quartiers, setQuartiers] = useState([]);
     const [loadingCities, setLoadingCities] = useState(true);
     const [errorCities, setErrorCities] = useState(null);
 
-    const fetchCities = async () => {
+    const fetchQuartiers = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/cities');
-            setCities(response.data);
+            const response = await axios.get(`http://localhost:3000/api/quartiers/${cityId}`);
+            setQuartiers(response.data);
         } catch (error) {
             console.error("Erreur lors de la récupération des villes :", error);
             setErrorCities("Impossible de charger les villes. Veuillez réessayer.");
@@ -32,7 +33,7 @@ const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
     };
 
     useEffect(() => {
-        fetchCities();
+        fetchQuartiers();
     }, []);
 
     useEffect(() => {
@@ -105,16 +106,16 @@ const EventForm = ({ onSubmit, initialData = {}, isEditing = false }) => {
             </div>
 
             <div className="mb-4">
-                <label className="block font-semibold mb-1">Ville :</label>
+                <label className="block font-semibold mb-1">Quartier :</label>
                 <select
                     value={formData.city_id}
-                    onChange={(e) => setFormData({ ...formData, city_id: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, quartierId: e.target.value })}
                     className="border p-2 w-full rounded"
                 >
-                    <option value="">-- Sélectionner une ville --</option>
-                    {cities.map((city) => (
-                        <option key={city.id} value={city.id}>
-                            {city.name}
+                    <option value="">-- Sélectionner un quartier --</option>
+                    {quartiers.map((quartier) => (
+                        <option key={quartier.id} value={quartier.id}>
+                            {quartier.name}
                         </option>
                     ))}
                 </select>
