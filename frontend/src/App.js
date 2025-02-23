@@ -10,14 +10,10 @@ import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
 import EventPage from './pages/EventPage';
 import Navbar from './components/Navbar';
-<<<<<<< HEAD
 import ProjectsPage from './pages/ProjectsPage';
 import ProjectDetails from './pages/ProjectDetails';
 import EditProject from "./pages/EditProject";
-=======
-import ProjectsPage from "./pages/ProjectsPage";
 import SignalementsPage from './pages/SignalementsPage';
->>>>>>> a31b5c7 (Adding signalement components)
 
 const App = () => {
   const { userId } = useAuth();
