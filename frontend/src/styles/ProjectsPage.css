@@ -1,9 +1,8 @@
 .projects-page {
-  padding: 1.5rem; 
-  background-color: #f3f4f6; 
-  min-height: 100vh; 
+  padding: 1.5rem;
+  background-color: #f3f4f6;
+  min-height: 100vh;
 }
-
 
 .projects-page h2 {
   text-align: center;
@@ -12,7 +11,8 @@
 
 .projects-page .header {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: space-between;
   padding: 10px 20px;
 }
 
@@ -28,4 +28,19 @@
 
 .create-button:hover {
   background: #218838;
+}
+
+/* ✅ Ajout de la checkbox avec un bon alignement */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espace entre la case et le texte */
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.checkbox-container input {
+  cursor: pointer;
+  width: 15px;
+  /* height: 25px; */
 }
