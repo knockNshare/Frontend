@@ -4,7 +4,7 @@ import "../styles/Dashboard.css";
 import SearchFeature from "../components/SearchFeature";
 import SignalementsList from "../components/SignalementsList";
 import { gapi } from "gapi-script";
-
+import DashboardCalendar from "../components/DashboardCalendar";
 const CLIENT_ID = "741897451593-7mjv05taqv633jrtq9imhhf9mdlgm9sk.apps.googleusercontent.com"; // Replace with your Google Client ID
 const API_KEY = "AIzaSyDCy6ltlg9ThWq5QjYaHlJawvJ3opvHmEI"; // Replace with your Google API Key
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
@@ -20,6 +20,8 @@ function Dashboard() {
                 apiKey: API_KEY,
                 clientId: CLIENT_ID,
                 scope: SCOPES,
+                discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+                redirect_uri: "http://localhost:3001", // Explicitly set the redirect URI
             });
         };
         gapi.load("client:auth2", initClient);
@@ -62,8 +64,13 @@ function Dashboard() {
             maxResults: 10,
             orderBy: "startTime",
         }).then((response) => {
-            const events = response.result.items;
-            setEvents(events);
+            if (response.result && response.result.items) {
+                console.log("Fetched events:", response.result.items);
+                const events = response.result.items;
+                setEvents(events);
+            } else {
+                console.error("No events found or response is undefined:", response);
+            }
         }).catch((error) => {
             console.error("Error fetching calendar events:", error);
         });
@@ -90,13 +97,11 @@ function Dashboard() {
                     <button onClick={handleAuthClick} className="auth-button">
                         Connect to Google Calendar
                     </button>
-                    <ul>
-                        {events.map((event) => (
-                            <li key={event.id}>
-                                <strong>{event.summary}</strong> - {new Date(event.start.dateTime || event.start.date).toLocaleString()}
-                            </li>
-                        ))}
-                    </ul>
+                   
+                </section>
+                <section className="dashboard-section">
+                    <h2>📅 Google Calendar</h2>
+                    <DashboardCalendar events={events} />
                 </section>
             </main>
         </div>
