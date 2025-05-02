@@ -31,14 +31,14 @@ const EventPage = () => {
             const cityResponse = await axios.get(`http://localhost:3000/users/city/${userId}`);
             const userCityId = cityResponse.data.data.city_id; // Correct way to access city_id
             setCityId(userCityId);
-            console.log("userCityId is",userCityId);
-            // Update state with city ID
+            console.log("userCityId is", userCityId);
     
-            // Fetch events related to the city
-            const eventsResponse = await axios.get(`http://localhost:3000/api/events/region/${userCityId}`);
-            console.log("events",eventsResponse);
+            // Fetch events related to the city with participation status
+            const eventsResponse = await axios.get(`http://localhost:3000/api/events/region/${userCityId}`, {
+                params: { user_id: userId },
+            });
+            console.log("events", eventsResponse);
             setEvents(eventsResponse.data);
-
         } catch (error) {
             console.error('Erreur lors de la récupération des données :', error);
             setError('Impossible de charger les données. Veuillez réessayer plus tard.');
@@ -53,7 +53,8 @@ const EventPage = () => {
                 params: {
                     keyword: searchTerm,
                     categories: selectedCategories.join(','), // Join selected categories to send in the request
-                    cityId : cityId
+                    cityId: cityId,
+                    user_id: userId, // Pass user_id to get participation status
                 },
             });
             setEvents(response.data); // Update events with filtered results
@@ -62,7 +63,6 @@ const EventPage = () => {
             setError('Impossible de charger les événements filtrés.');
         }
     };
-
     useEffect(() => {
         fetchData();
     }, []);
@@ -104,7 +104,33 @@ const EventPage = () => {
             console.error('Erreur lors de la récupération des détails de l\'événement :', error);
         }
     };
-
+    const toggleParticipation = async (eventId) => {
+        try {
+            const event = events.find((e) => e.id === eventId);
+            if (event.isParticipating) {
+                console.log("user", userId,"is participating in the event", eventId);
+                await axios.delete('http://localhost:3000/api/events/leave', {
+                    data: { event_id: eventId, user_id: userId }, // Ensure correct data is sent
+                });
+                alert('You have left the event.');
+            } else {
+                await axios.post('http://localhost:3000/api/events/participate', {
+                    event_id: eventId,
+                    user_id: userId,
+                });
+                alert('You have joined the event.');
+            }
+            // Update the event's participation status
+            setEvents((prevEvents) =>
+                prevEvents.map((e) =>
+                    e.id === eventId ? { ...e, isParticipating: !e.isParticipating } : e
+                )
+            );
+        } catch (error) {
+            console.error('Error toggling participation:', error);
+            alert('An error occurred. Please try again.');
+        }
+    };
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <h1 className="text-2xl font-bold mb-4">Gestion des Événements</h1>
@@ -199,6 +225,17 @@ const EventPage = () => {
                 <p className="text-sm text-gray-500 mb-2">
                     {`Date : ${new Date(event.date).toLocaleString()}`}
                 </p>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering the card click
+                        toggleParticipation(event.id);
+                    }}
+                    className={`px-4 py-2 rounded ${
+                        event.isParticipating ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
+                    }`}
+                >
+                    {event.isParticipating ? 'Leave' : 'Participate'}
+                </button>
             </div>
         ))
     )}
