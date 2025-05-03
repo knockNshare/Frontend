@@ -118,7 +118,20 @@ const EventPage = () => {
                     event_id: eventId,
                     user_id: userId,
                 });
-                alert('You have joined the event.');
+                // On fait appel au backend pour Google Calendar
+                const token = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+
+                await axios.post('http://localhost:3000/api/google/create-event', {
+                    token,
+                    title: event.title,
+                    description: event.description,
+                    location: event.address,
+                    startTime: new Date(event.date).toISOString(),
+                    endTime: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000).toISOString(), // ajoute 2h
+                });
+
+                alert('You have joined the event and it was added to your Google Calendar.');
+        
             }
             // Update the event's participation status
             setEvents((prevEvents) =>

@@ -5,8 +5,8 @@ import SearchFeature from "../components/SearchFeature";
 import SignalementsList from "../components/SignalementsList";
 import { gapi } from "gapi-script";
 import DashboardCalendar from "../components/DashboardCalendar";
-const CLIENT_ID = "741897451593-7mjv05taqv633jrtq9imhhf9mdlgm9sk.apps.googleusercontent.com"; // Replace with your Google Client ID
-const API_KEY = "AIzaSyDCy6ltlg9ThWq5QjYaHlJawvJ3opvHmEI"; // Replace with your Google API Key
+const CLIENT_ID = "741897451593-7mjv05taqv633jrtq9imhhf9mdlgm9sk.apps.googleusercontent.com"; // Google Client ID
+const API_KEY = "AIzaSyDCy6ltlg9ThWq5QjYaHlJawvJ3opvHmEI"; // Google API Key
 const SCOPES = "https://www.googleapis.com/auth/calendar.readonly";
 
 function Dashboard() {
@@ -14,19 +14,19 @@ function Dashboard() {
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
-        // Initialize Google API client
+        // We initialize Google API client
         const initClient = () => {
             gapi.client.init({
                 apiKey: API_KEY,
                 clientId: CLIENT_ID,
                 scope: SCOPES,
                 discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-                redirect_uri: "http://localhost:3001", // Explicitly set the redirect URI
+                redirect_uri: "http://localhost:3001", 
             });
         };
         gapi.load("client:auth2", initClient);
 
-        // Fetch initial signalements
+        // We fetch initial signalements
         axios.get("http://localhost:3000/signalements")
             .then((response) => {
                 setSignalements(response.data.signalements);
@@ -35,7 +35,7 @@ function Dashboard() {
                 console.error("Erreur récupération signalements :", error);
             });
 
-        // WebSocket for live updates
+        // We use WebSocket for live updates
         if (window.socket) {
             window.socket.on("new-signalement", (newSignalement) => {
                 setSignalements((prevSignalements) => [newSignalement, ...prevSignalements.slice(0, 4)]);
