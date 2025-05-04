@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { gapi } from "gapi-script";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
 const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
@@ -88,11 +88,16 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = async () => {
     if (authInstance) {
-      await authInstance.signIn();
-      const token = authInstance.currentUser.get().getAuthResponse().access_token;
-      setGoogleAccessToken(token);
+      try {
+        await authInstance.signIn();
+        const token = authInstance.currentUser.get().getAuthResponse().access_token;
+        updateGoogleAccessToken(token);
+        console.log("Google account linked successfully!");
+      } catch (error) {
+        console.error("Error linking Google account:", error);
+      }
     } else {
-      console.warn("authInstance not ready yet.");
+      console.warn("Google Auth instance not ready yet.");
     }
   };
 

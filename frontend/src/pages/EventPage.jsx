@@ -63,28 +63,28 @@ const EventPage = () => {
             console.log("Access token from context:", googleAccessToken);
 
             await axios.post('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
-              summary: event.title,
-              description: event.description,
-              location: event.address,
-              start: {
-                  dateTime: new Date(event.date).toISOString(),
-                  timeZone: 'Europe/Paris',
-              },
-              end: {
-                  dateTime: new Date(
-                      new Date(event.date).getTime() + 2 * 60 * 60 * 1000
-                  ).toISOString(), // On fait l'hypotèse que l'événement dure 2 heures
-                  timeZone: 'Europe/Paris',
-              },
-          }, {
-              headers: {
-                  Authorization: `Bearer ${googleAccessToken}`,
-                  'Content-Type': 'application/json',
-          }});
+                summary: event.title,
+                description: event.description,
+                location: event.address,
+                start: {
+                    dateTime: new Date(event.date).toISOString(),
+                    timeZone: 'Europe/Paris',
+                },
+                end: {
+                    dateTime: new Date(
+                        new Date(event.date).getTime() + 2 * 60 * 60 * 1000
+                    ).toISOString(), // On fait l'hypotèse que l'événement dure 2 heures
+                    timeZone: 'Europe/Paris',
+                },
+            }, {
+                headers: {
+                    Authorization: `Bearer ${googleAccessToken}`,
+                    'Content-Type': 'application/json',
+            }});
 
-          alert('Tu participes à l\'événement ! Celui-ci a été ajouté à ton Google Calendar.');
-  
-      }
+            alert('Tu participes à l\'événement ! Celui-ci a été ajouté à ton Google Calendar.');
+    
+        }
         // On met à jour l'état local pour refléter le changement de participation
         setEvents((prevEvents) =>
             prevEvents.map((e) =>
@@ -92,6 +92,7 @@ const EventPage = () => {
             )
         );
     } catch (error) {
+      console.log("Token, erreur", googleAccessToken);
         console.error("Erreur lors de la participation ou de l'ajout au calendrier", error);
         alert("Une erreur est survenue. Vérifie que tu es connecté(e) à Google Calendar.");
     }
