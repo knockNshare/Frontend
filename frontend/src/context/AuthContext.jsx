@@ -8,6 +8,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
+  
+    console.log("localStorage :", localStorage);
 
     console.log("📌 Vérification initiale userId dans localStorage :", storedUserId);
 
@@ -29,6 +31,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     console.log("🚪 Déconnexion...");
     localStorage.removeItem("userId");
+    localStorage.removeItem("googleAccessToken");
     setUserId(null);
   };
 

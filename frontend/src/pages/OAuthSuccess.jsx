@@ -9,15 +9,19 @@ const OAuthSuccess = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
+    const accessToken = params.get("access_token");
 
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
+
         const userId = payload.id;
 
         if (!userId) throw new Error("ID manquant dans le token");
 
         localStorage.setItem("userId", userId);
+        localStorage.setItem("googleAccessToken", accessToken); // c'est l'acessToken à récupérer pour Google Calendar 
+
         login(userId);
 
         navigate("/dashboard");
@@ -27,7 +31,7 @@ const OAuthSuccess = () => {
       }
     } else {
       navigate("/login");
-    }
+    } 
   }, []);
 
   return <div>Connexion avec Google en cours...</div>;
