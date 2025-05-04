@@ -56,6 +56,20 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-gray-700 mb-6">Connexion</h2>
+        <div className="mt-6">
+          <button
+            onClick={() => window.location.href = "http://localhost:3000/api/auth/google"}
+            className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded shadow"
+          >
+            Se connecter avec Google
+          </button>
+
+          <div className="flex items-center my-4">
+            <hr className="flex-grow border-gray-300" />
+            <span className="mx-4 text-gray-500">Ou</span>
+            <hr className="flex-grow border-gray-300" />
+          </div>
+        </div>
         <form onSubmit={handleSubmit}>
           <InputField
             id="email"
@@ -87,18 +101,6 @@ const LoginPage = () => {
           </Link>
         </p>
       </div>
-
-      <div className="mt-6 text-center">
-        <p className="text-sm text-gray-500 mb-2">Ou</p>
-        <a
-          href="http://localhost:3000/api/auth/google"
-          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded inline-block transition"
-        >
-          Se connecter avec Google
-        </a>
-      </div>
-
-
     </div>
   );
 };
