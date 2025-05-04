@@ -87,6 +87,18 @@ const LoginPage = () => {
           </Link>
         </p>
       </div>
+
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-500 mb-2">Ou</p>
+        <a
+          href="http://localhost:3000/api/auth/google"
+          className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded inline-block transition"
+        >
+          Se connecter avec Google
+        </a>
+      </div>
+
+
     </div>
   );
 };

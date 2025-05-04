@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import io from "socket.io-client";
 import { useAuth } from './context/AuthContext';
+import OAuthSuccess from './pages/OAuthSuccess';
+
 
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -51,6 +53,7 @@ const App = () => {
     <Router>
       {userId && <Navbar />}
       <Routes>
+        <Route path="/oauth-success" element={<OAuthSuccess />} /> 
         {!userId ? (
           <>
             <Route path="/" element={<HomePage />} />
