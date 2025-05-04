@@ -12,7 +12,7 @@ import { GoogleAuthContext } from "../context/GoogleAuthProvider";
 function Dashboard() {
   const [signalements, setSignalements] = useState([]);
   const [events, setEvents] = useState([]);
-  const { token, signIn } = useContext(GoogleAuthContext);
+  const { token, signIn } = useContext(GoogleAuthContext); // Récupération du token et de la fonction signIn depuis le contexte
 
 
 

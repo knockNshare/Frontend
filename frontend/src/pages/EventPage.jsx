@@ -19,7 +19,7 @@ const EventPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { userId } = useAuth();
-    const { getAccessToken } = useContext(GoogleAuthContext); // Récupération du token d'accès depuis le contexte
+    const { token } = useContext(GoogleAuthContext); // Récupération du token d'accès depuis le contexte
 
     
 
@@ -129,7 +129,7 @@ const EventPage = () => {
                     user_id: userId,
                 });
                 
-                //console.log("Access token from context:", token);
+                console.log("Access token from context:", token);
 
                 await axios.post('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
                     summary: event.title,
@@ -147,7 +147,7 @@ const EventPage = () => {
                     },
                 }, {
                     headers: {
-                        Authorization: `Bearer ${getAccessToken()}`,
+                        Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
                 }});
 
