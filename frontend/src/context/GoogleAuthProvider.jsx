@@ -3,8 +3,8 @@ import { gapi } from "gapi-script";
 
 export const GoogleAuthContext = createContext();
 
-const CLIENT_ID = "846642083632-iei8anf3jcf6l3dh4l9qa2rlmtgficns.apps.googleusercontent.com";
-const API_KEY = "AIzaSyDDCLU5DX4Rs02KSzMOFgnB6gry1tyiKeI";
+const CLIENT_ID = process.env.REACT_APP_GOOGLE_CLIENT_ID;
+const API_KEY = process.env.REACT_APP_GOOGLE_API_KEY;
 const SCOPES = "https://www.googleapis.com/auth/calendar.events";
 const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"];
 
