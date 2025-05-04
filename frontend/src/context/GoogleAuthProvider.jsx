@@ -46,7 +46,7 @@ export const GoogleAuthProvider = ({ children }) => {
       gapi.load("client:auth2", start);
     }, []);
   
-    const getAccessToken = () => accessToken;
+    //const getAccessToken = () => accessToken;
   
     const signIn = async () => {
       if (authInstance) {
