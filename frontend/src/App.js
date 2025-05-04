@@ -14,11 +14,12 @@ import ProjectsPage from './pages/ProjectsPage';
 import ProjectDetails from './pages/ProjectDetails';
 import EditProject from "./pages/EditProject";
 import SignalementsPage from './pages/SignalementsPage';
+import { GoogleAuthProvider } from './context/GoogleAuthProvider';
 
 const App = () => {
   const { userId } = useAuth();
   const [socketConnected, setSocketConnected] = useState(false);
-  const [appLoaded, setAppLoaded] = useState(false); // ✅ Ajout pour contrôler le chargement
+  const [appLoaded, setAppLoaded] = useState(false); // Ajout pour contrôler le chargement
 
   useEffect(() => {
     if (userId && !window.socket) {
@@ -48,6 +49,7 @@ const App = () => {
   }
 
   return (
+    <GoogleAuthProvider>
     <Router>
       {userId && <Navbar />}
       <Routes>
@@ -72,6 +74,7 @@ const App = () => {
         )}
       </Routes>
     </Router>
+    </GoogleAuthProvider>
   );
 };
 

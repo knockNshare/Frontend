@@ -4,6 +4,9 @@ import EventDetails from '../components/EventDetails';
 import DefaultImage from '../assets/default-eventpic.jpg';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useContext } from 'react';
+import { GoogleAuthContext } from '../context/GoogleAuthProvider';
+
 
 const EventPage = () => {
     const [events, setEvents] = useState([]);
@@ -16,6 +19,8 @@ const EventPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { userId } = useAuth();
+    const { getAccessToken } = useContext(GoogleAuthContext); // Récupération du token d'accès depuis le contexte
+
     
 
     const categories = ['Fête', 'Barbecue', 'Sport', 'Culture', 'Musique', 'Réunion'];
@@ -107,41 +112,57 @@ const EventPage = () => {
     const toggleParticipation = async (eventId) => {
         try {
             const event = events.find((e) => e.id === eventId);
+
             if (event.isParticipating) {
+
+                //Si l'utilisateur participe déjà à l'événement, on le retire
                 console.log("user", userId,"is participating in the event", eventId);
+
                 await axios.delete('http://localhost:3000/api/events/leave', {
-                    data: { event_id: eventId, user_id: userId }, // Ensure correct data is sent
+                    data: { event_id: eventId, user_id: userId }, 
                 });
-                alert('You have left the event.');
+                alert('Tu as quitté l\'événement.');
             } else {
+                // Si l'utilisateur ne participe pas encore, on l'ajoute + créer l'événement dans Google Calendar
                 await axios.post('http://localhost:3000/api/events/participate', {
                     event_id: eventId,
                     user_id: userId,
                 });
-                // On fait appel au backend pour Google Calendar
-                const token = window.gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
+                
+                //console.log("Access token from context:", token);
 
-                await axios.post('http://localhost:3000/api/google/create-event', {
-                    token,
-                    title: event.title,
+                await axios.post('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+                    summary: event.title,
                     description: event.description,
                     location: event.address,
-                    startTime: new Date(event.date).toISOString(),
-                    endTime: new Date(new Date(event.date).getTime() + 2 * 60 * 60 * 1000).toISOString(), // ajoute 2h
-                });
+                    start: {
+                        dateTime: new Date(event.date).toISOString(),
+                        timeZone: 'Europe/Paris',
+                    },
+                    end: {
+                        dateTime: new Date(
+                            new Date(event.date).getTime() + 2 * 60 * 60 * 1000
+                        ).toISOString(), // On fait l'hypotèse que l'événement dure 2 heures
+                        timeZone: 'Europe/Paris',
+                    },
+                }, {
+                    headers: {
+                        Authorization: `Bearer ${getAccessToken()}`,
+                        'Content-Type': 'application/json',
+                }});
 
-                alert('You have joined the event and it was added to your Google Calendar.');
+                alert('Tu participes à l\'événement ! Celui-ci a été ajouté à ton Google Calendar.');
         
             }
-            // Update the event's participation status
+            // On met à jour l'état local pour refléter le changement de participation
             setEvents((prevEvents) =>
                 prevEvents.map((e) =>
                     e.id === eventId ? { ...e, isParticipating: !e.isParticipating } : e
                 )
             );
         } catch (error) {
-            console.error('Error toggling participation:', error);
-            alert('An error occurred. Please try again.');
+            console.error("Erreur lors de la participation ou de l'ajout au calendrier", error);
+            alert("Une erreur est survenue. Vérifie que tu es connecté(e) à Google Calendar.");
         }
     };
     return (
@@ -247,7 +268,7 @@ const EventPage = () => {
                         event.isParticipating ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
                     }`}
                 >
-                    {event.isParticipating ? 'Leave' : 'Participate'}
+                    {event.isParticipating ? 'Quitter' : 'Participer'}
                 </button>
             </div>
         ))
