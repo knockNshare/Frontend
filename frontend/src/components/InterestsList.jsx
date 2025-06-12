@@ -5,7 +5,7 @@ import io from "socket.io-client";
 
 const socket = io("http://localhost:5001");
 
-function InterestsList({ highlightId }) { // 🔥 highlightId reçu depuis UserProfile.jsx
+function InterestsList({ highlightId }) {
   const [interests, setInterests] = useState([]);
   const [error, setError] = useState(null);
   const highlightRef = useRef(null);
@@ -31,50 +31,83 @@ function InterestsList({ highlightId }) { // 🔥 highlightId reçu depuis UserP
     fetchInterests();
   }, []);
 
-  // 🔥 Correction : Le scroll ne s'effectue qu'une fois que les intérêts sont chargés
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    socket.on(`notification-${userId}`, (notification) => {
+      if (notification.type.startsWith("interest_")) {
+        const { related_entity_id, telegramGroupLink } = notification;
+
+        setInterests((prev) => {
+          const updated = prev.map((interest) =>
+            interest.id === related_entity_id
+              ? {
+                  ...interest,
+                  status: notification.type.split("_")[1],
+                  telegramGroupLink: telegramGroupLink || null,
+                }
+              : interest
+          );
+          console.log("📨 Interests après update WebSocket :", updated);
+          return updated;
+        });
+        
+      }
+    });
+
+    return () => {
+      socket.off(`notification-${userId}`);
+    };
+  }, []);
+
   useEffect(() => {
     if (highlightId) {
       const elementToHighlight = document.getElementById(`interest-${highlightId}`);
       if (elementToHighlight) {
-        console.log("📌 Scrolling vers l'intérêt ID :", highlightId);
         elementToHighlight.scrollIntoView({ behavior: "smooth", block: "center" });
-
         elementToHighlight.classList.add("highlight");
         setTimeout(() => elementToHighlight.classList.remove("highlight"), 3000);
       }
     }
   }, [highlightId, interests]);
 
-  // 🔥 Fonction pour accepter ou refuser un intérêt
   const handleAction = async (interestId, action, interestedUserId, title) => {
     try {
-        const response = await axios.put(`http://localhost:3000/interests/${interestId}`, { status: action });
+      const response = await axios.put(`http://localhost:3000/interests/${interestId}`, { status: action });
 
-        // 🔥 Si accepté, récupérer les contacts du proposeur
-        if (action === "accepted") {
-            const { data } = await axios.get(`http://localhost:3000/users/${interestedUserId}/contact`);
-            
-            setInterests((prev) =>
-                prev.map((interest) =>
-                    interest.id === interestId
-                        ? { ...interest, status: action, proposerContact: data }
-                        : interest
-                )
-            );
-        } else {
-            setInterests((prev) =>
-                prev.map((interest) =>
-                    interest.id === interestId ? { ...interest, status: action } : interest
-                )
-            );
-        }
+      if (action === "accepted") {
+        const contactResponse = await axios.get(`http://localhost:3000/users/${interestedUserId}/contact`);
+        const contactData = contactResponse.data.data;
+      
+        const telegramLink = response.data.telegramGroupLink;
+      
+        setInterests((prev) =>
+          prev.map((interest) =>
+            interest.id === interestId
+              ? {
+                  ...interest,
+                  status: action,
+                  proposerContact: contactData,
+                  telegramGroupLink: telegramLink || null
+                }
+              : interest
+          )
+        );
+      }
+       else {
+        setInterests((prev) =>
+          prev.map((interest) =>
+            interest.id === interestId ? { ...interest, status: action } : interest
+          )
+        );
+      }
     } catch (error) {
-        console.error("Erreur lors de la mise à jour de l'intérêt :", error);
-        alert("Une erreur est survenue lors de la mise à jour de l'intérêt.");
+      console.error("Erreur lors de la mise à jour de l'intérêt :", error);
+      alert("Une erreur est survenue lors de la mise à jour de l'intérêt.");
     }
-};
+  };
 
-  // 🔥 Fonction pour récupérer les contacts après acceptation
   const fetchContact = async (interestId, userId) => {
     try {
       const response = await axios.get(`http://localhost:3000/users/${userId}/contact`);
@@ -121,22 +154,36 @@ function InterestsList({ highlightId }) { // 🔥 highlightId reçu depuis UserP
                     </button>
                   </>
                 )}
-                {interest.status === "accepted" && !interest.contact && (
-                  <button
-                    className="show-contact-btn"
-                    onClick={() => fetchContact(interest.id, interest.interested_user_id)}
-                  >
-                    Afficher le contact
-                  </button>
+                {interest.status === "accepted" && (
+                  <>
+                    {!interest.contact && (
+                      <button
+                        className="show-contact-btn"
+                        onClick={() => fetchContact(interest.id, interest.interested_user_id)}
+                      >
+                        Afficher le contact
+                      </button>
+                    )}
+                    {interest.contact && (
+                      <div className="contact-details">
+                        <p>Téléphone : {interest.contact.phone_number}</p>
+                        <p>Email : {interest.contact.email}</p>
+                      </div>
+                    )}
+                    {interest.telegramGroupLink && (
+                      <a
+                        href={interest.telegramGroupLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="telegram-link"
+                      >
+                        📲 Créer un groupe Telegram pour ce prêt
+                      </a>
+                    )}
+                  </>
                 )}
                 {interest.status === "rejected" && (
                   <p className="rejected-message">Vous avez refusé cette demande.</p>
-                )}
-                {interest.contact && (
-                  <div className="contact-details">
-                    <p>Téléphone : {interest.contact.phone_number}</p>
-                    <p>Email : {interest.contact.email}</p>
-                  </div>
                 )}
               </div>
             </li>
