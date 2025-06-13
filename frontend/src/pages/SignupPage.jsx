@@ -15,6 +15,7 @@ const SignupPage = () => {
   const [selectedQuartier, setSelectedQuartier] = useState(''); 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [telegramUsername, setTelegramUsername] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,6 +58,7 @@ const SignupPage = () => {
         password,
         city_id: cityId,
         quartier_id: selectedQuartier, // Only one quartier selected
+        telegram_username: telegramUsername
       });
 
       if (response.status === 201) {
@@ -107,6 +109,15 @@ const SignupPage = () => {
             value={cityId}
             onChange={(e) => setCityId(e.target.value)}
           />
+          <label>
+              Pseudo Telegram (facultatif)
+              <input
+                type="text"
+                placeholder="@username"
+                value={telegramUsername}
+                onChange={(e) => setTelegramUsername(e.target.value)}
+              />
+            </label>
 
           <div className="mb-4">
             <select

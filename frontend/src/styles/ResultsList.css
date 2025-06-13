@@ -49,3 +49,11 @@
   .results-list-button:hover {
     background-color: #0056b3;
   }
+
+  .telegram-warning {
+    background-color: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+  }

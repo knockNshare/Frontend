@@ -18,16 +18,24 @@ function InterestsList({ highlightId }) {
           setError("Vous devez être connecté pour afficher vos intérêts reçus.");
           return;
         }
-
+  
         const response = await axios.get(`http://localhost:3000/interests/received/${userId}`);
-        setInterests(response.data.data || []);
+        console.log(" Données reçues du backend :", response.data); 
+        const formatted = (response.data.data || []).map((i) => {
+          console.log("username reçu pour", i.interested_user_name, ":", i.telegram_username);
+          return {
+            ...i,
+            telegram_username: i.telegram_username || null,
+          };
+        });
+        setInterests(formatted);
         setError(null);
       } catch (error) {
         console.error("Erreur lors de la récupération des intérêts :", error);
         setError(error.response?.data?.error || "Une erreur est survenue.");
       }
     };
-
+  
     fetchInterests();
   }, []);
 
@@ -168,17 +176,18 @@ function InterestsList({ highlightId }) {
                       <div className="contact-details">
                         <p>Téléphone : {interest.contact.phone_number}</p>
                         <p>Email : {interest.contact.email}</p>
+
+                        {interest.telegram_username && (
+                        <a
+                          href={`https://t.me/${interest.telegram_username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="telegram-link"
+                        >
+                          💬 Le contacter sur Telegram (@{interest.telegram_username})
+                        </a>
+                      )}
                       </div>
-                    )}
-                    {interest.telegramGroupLink && (
-                      <a
-                        href={interest.telegramGroupLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="telegram-link"
-                      >
-                        📲 Créer un groupe Telegram pour ce prêt
-                      </a>
                     )}
                   </>
                 )}

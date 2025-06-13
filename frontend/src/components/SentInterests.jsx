@@ -1,54 +1,56 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles/SentInterests.css";
 
 function SentInterests() {
-  const [sentInterests, setSentInterests] = useState([]);
-  const [error, setError] = useState(null);
+  const [interests, setInterests] = useState([]);
 
   useEffect(() => {
-    const fetchSentInterests = async () => {
+    const fetchInterests = async () => {
       try {
         const userId = localStorage.getItem("userId");
-        if (!userId) {
-          setError("Vous devez être connecté pour voir vos demandes envoyées.");
-          return;
-        }
+        if (!userId) return;
 
         const response = await axios.get(`http://localhost:3000/interests/sent/${userId}`);
-        setSentInterests(response.data.data || []);
-        setError(null);
+        setInterests(response.data.data || []);
       } catch (error) {
-        console.error("Erreur lors de la récupération des demandes envoyées :", error);
-        setError(error.response?.data?.error || "Une erreur est survenue.");
+        console.error("Erreur lors de la récupération des intérêts envoyés :", error);
       }
     };
 
-    fetchSentInterests();
+    fetchInterests();
   }, []);
 
   return (
     <div className="section">
-      <h2>📤 Mes Demandes Envoyées</h2>
-      {error && <p className="error-message">{error}</p>}
+      <h2>📬 Mes Demandes Envoyées</h2>
       <ul className="interests-list">
-        {sentInterests.length === 0 ? (
-          <p className="empty-message">Aucune demande envoyée pour le moment.</p>
+        {interests.length === 0 ? (
+          <p>Aucune demande envoyée.</p>
         ) : (
-          sentInterests.map((interest) => (
-            <li key={interest.id} className={`interests-item status-${interest.status}`}>
-              <div className="interest-content">
-                <strong className="interest-title">{interest.proposition_title}</strong>
-                <p>
-                  <span className="interest-status">{interest.status === "accepted" ? "✅ Accepté" : interest.status === "rejected" ? "❌ Refusé" : "⏳ En attente"}</span>
-                </p>
-                {interest.status === "accepted" && interest.proposer_contact && (
-                  <p className="contact-info">
-                    📧 {interest.proposer_contact.email} <br />
-                    📞 {interest.proposer_contact.phone || "Non renseigné"}
-                  </p>
-                )}
+          interests.map((interest) => (
+            <li key={interest.id} className="interests-item">
+              <div>
+                <strong>{interest.proposition_title}</strong>
+                <p><small>Statut : {interest.status}</small></p>
               </div>
+
+              {interest.status === "accepted" && (
+                <>
+                  <div className="contact-details">
+                    <p>📧 {interest.proposer_contact.email}</p>
+                    <p>📞 {interest.proposer_contact.phone}</p>
+                  </div>
+
+                  {/* <a
+                    className="telegram-link-btn"
+                    href={`https://t.me/KnockNShareBot?startgroup=loan_${interest.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    💬 Créer un groupe Telegram avec le proposeur
+                  </a> */}
+                </>
+              )}
             </li>
           ))
         )}
